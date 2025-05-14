@@ -10,7 +10,7 @@ Job hunting for the best listings can be tough with scattered listings and no si
 We will use React to build a responsive web app that both users and employers can use.
 
 # Back End
-We will use MySQL to store user, employer, and job listing information, and deploy a Node.js server to handle data transfer between the front end and the database.
+We will use SQLite to store user, employer, and job listing information, and deploy a FastAPI server to handle data transfer between the front end and the database.
 
 # Requirements
 ## Functional
