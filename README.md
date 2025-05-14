@@ -16,9 +16,7 @@ We will use SQLite to store user, employer, and job listing information, and dep
 ## Functional
 Users should be able to sign up, log in/out, and reset their password.
 
-Users should be able to browse and search for job listings, with filters for title, location, type, experience, and salary.
-
-Users should be able to view job listing details, including title, location, type, experience, and salary.
+Users should be able to search, browse, and view job listing details, including title, location, type, experience, and salary.
 
 Users should be able to apply to job listings and monitor their application status.
 
