@@ -12,14 +12,22 @@ export default function NavBar({ token, onLogout }) {
 
         <div className="flex items-center gap-3">
           <Link
-            to="/search"
+            to="/home"
             className="underline hover:text-gray-200 text-sm font-medium"
           >
             Search jobs
           </Link>
 
           {token ? (
-            <JbwButton onClick={onLogout}>Log&nbsp;out</JbwButton>
+            <>
+              <Link
+                to="/dashboard"
+                className="underline hover:text-gray-200 text-sm font-medium"
+              >
+                Dashboard
+              </Link>
+              <JbwButton onClick={onLogout}>Log&nbsp;out</JbwButton>
+            </>
           ) : (
             <>
               <Link
@@ -42,3 +50,4 @@ export default function NavBar({ token, onLogout }) {
     </header>
   );
 }
+
