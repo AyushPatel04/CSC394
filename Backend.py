@@ -76,6 +76,13 @@ class JobListing(SQLModel, table=True):
     experience: str
     salary: str
     
+class Application(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    employer_id: int = Field(foreign_key="employer.id")
+    job_listing_id: int = Field(foreign_key="joblisting.id")
+    status: Optional[str] = Field(default="Submitted")
+    
 class Credentials(BaseModel):
     username: str
     password: str
@@ -213,6 +220,24 @@ def delete_listing(listing_id: int, session: Session = Depends(get_session)):
         raise HTTPException(404, "Listing not found")
     session.delete(lst); session.commit()
     return {"ok": True}
+
+@app.post("/applications", response_model=Application)
+def create_application(application: Application, session: Session = Depends(get_session)):
+    session.add(application); session.commit(); session.refresh(application)
+    return application
+
+@app.get("/applications", response_model=List[Application])
+def read_application(session: Session = Depends(get_session)):
+    return session.exec(select(Application)).all()
+
+@app.delete("/applications/{application_id}")
+def delete_application(application_id: int, session: Session = Depends(get_session)):
+    application = session.get(Application, application_id)
+    if not application:
+        raise HTTPException(404, "Application not found")
+    session.delete(application); session.commit()
+    return {"ok": True}
+
 
 
 REMOTIVE_PRIMARY  = "https://remotive.com/api/remote-jobs"
