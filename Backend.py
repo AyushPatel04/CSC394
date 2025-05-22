@@ -67,9 +67,11 @@ class Employer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     employer_name: str
     username: str
+    hashed_password: str
 
 class JobListing(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    employer_id: int = Field(foreign_key="employer.id")
     title: str
     location: str
     type: str
