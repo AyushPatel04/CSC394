@@ -2,33 +2,42 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import JbwButton from "../components/buttons";
 
-export default function Login({ setToken }) {
+export default function Login({ setToken, setUser }) {
   const nav = useNavigate();
 
-  const [user, setUser] = useState("");
-  const [pw,   setPw]   = useState("");
-  const [err,  setErr]  = useState(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState(null);
 
-  const submit = e => {
+  const submit = (e) => {
     e.preventDefault();
 
     const body = new URLSearchParams();
-    body.append("username", user);
-    body.append("password", pw);
+    body.append("username", username);
+    body.append("password", password);
     body.append("grant_type", "password");
 
     fetch("http://localhost:8000/login", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body
+      body,
     })
-      .then(r => (r.ok ? r.json() : Promise.reject()))
-      .then(d => {
-        localStorage.setItem("token", d.access_token);
-        setToken(d.access_token);
-        nav("/");
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data) => {
+        // Confirm structure before storing
+        if (!data.access_token || !data.user) throw new Error("Malformed response");
+
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setToken(data.access_token);
+        setUser(data.user);
+
+        nav("/dashboard");
       })
-      .catch(() => setErr("Invalid credentials"));
+      .catch((e) => {
+        console.error("Login error:", e);
+        setErr("Invalid credentials or server error");
+      });
   };
 
   return (
@@ -39,16 +48,16 @@ export default function Login({ setToken }) {
 
       <form onSubmit={submit} className="space-y-4">
         <input
-          value={user}
-          onChange={e => setUser(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           placeholder="Username"
           className="w-full p-3 border rounded-md"
           required
         />
         <input
           type="password"
-          value={pw}
-          onChange={e => setPw(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           className="w-full p-3 border rounded-md"
           required
@@ -65,3 +74,4 @@ export default function Login({ setToken }) {
     </div>
   );
 }
+

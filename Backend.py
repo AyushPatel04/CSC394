@@ -143,9 +143,16 @@ def login(
     user = session.exec(select(User).where(User.username == form.username)).first()
     if not user or not verify_pw(form.password, user.hashed_password):
         raise HTTPException(401, "Invalid credentials")
-    token = create_token({"sub": user.username})
-    return {"access_token": token, "token_type": "bearer"}
 
+    token = create_token({"sub": user.username})
+
+    return {
+        "access_token": token,
+        "user": {
+            "name": f"{user.first_name or ''} {user.last_name or ''}".strip(),
+            "username": user.username
+        }
+    }
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_REDIRECT_URI = "http://localhost:8000/google-callback"
