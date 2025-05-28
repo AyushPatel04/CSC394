@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import JbwButton from "../components/buttons";
 
-export default function Signup({ setToken }) {
+export default function Signup({ setToken, setUser }) {
   const nav = useNavigate();
 
-  const [user, setUser] = useState("");
-  const [pw,   setPw]   = useState("");
-  const [err,  setErr]  = useState(null);
+  const [user, setUserInput] = useState("");
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState(null);
 
   const submit = e => {
     e.preventDefault();
@@ -20,8 +20,10 @@ export default function Signup({ setToken }) {
       .then(r => (r.ok ? r.json() : Promise.reject()))
       .then(d => {
         localStorage.setItem("token", d.access_token);
+        localStorage.setItem("user", JSON.stringify(d.user)); // Save user object!
         setToken(d.access_token);
-        nav("/");
+        setUser(d.user); // Update app state
+        nav("/dashboard"); // Go to dashboard directly!
       })
       .catch(() => setErr("Username already taken"));
   };
@@ -35,7 +37,7 @@ export default function Signup({ setToken }) {
       <form onSubmit={submit} className="space-y-4">
         <input
           value={user}
-          onChange={e => setUser(e.target.value)}
+          onChange={e => setUserInput(e.target.value)}
           placeholder="Choose a username"
           className="w-full p-3 border rounded-md"
           required
@@ -60,3 +62,4 @@ export default function Signup({ setToken }) {
     </div>
   );
 }
+

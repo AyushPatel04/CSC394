@@ -18,17 +18,26 @@ export default function App() {
     }
   });
 
-
+  // Update state if localStorage changes in another tab/window
   useEffect(() => {
     const handleStorageChange = () => {
       setToken(localStorage.getItem("token"));
       const storedUser = localStorage.getItem("user");
       setUser(storedUser ? JSON.parse(storedUser) : null);
     };
-
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+
+  // On mount, if token/user are in localStorage but not in state, sync them (for reload)
+  useEffect(() => {
+    if (!token && localStorage.getItem("token")) {
+      setToken(localStorage.getItem("token"));
+    }
+    if (!user && localStorage.getItem("user")) {
+      setUser(JSON.parse(localStorage.getItem("user")));
+    }
+  }, [token, user]);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -44,7 +53,13 @@ export default function App() {
         <Route
           path="/"
           element={
-            <Welcome token={token} user={user} setToken={setToken} setUser={setUser} logout={logout} />
+            <Welcome
+              token={token}
+              user={user}
+              setToken={setToken}
+              setUser={setUser}
+              logout={logout}
+            />
           }
         />
         <Route path="/login" element={<Login setToken={setToken} setUser={setUser} />} />
@@ -56,7 +71,7 @@ export default function App() {
           path="/dashboard"
           element={
             <ProtectedRoute token={token}>
-              <Dashboard user={user} logout={logout} />
+              <Dashboard user={user} logout={logout} setUser={setUser} />
             </ProtectedRoute>
           }
         />

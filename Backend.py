@@ -2,6 +2,7 @@ from typing import Optional, List
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 import os
+
 from pydantic import BaseModel
 from fastapi import (
     FastAPI, Depends, HTTPException, status, Request, Response
@@ -14,10 +15,10 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 import httpx
 
-
+# ----- Auth config -----
 SECRET_KEY = os.getenv("JWT_SECRET", "dev-secret-change-me")
-ALGORITHM  = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -32,7 +33,7 @@ def create_token(data: dict, minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES):
     to_encode["exp"] = datetime.utcnow() + timedelta(minutes=minutes)
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-
+# ----- Database config -----
 sqlite_file_name = "jobs.db"
 engine = create_engine(f"sqlite:///{sqlite_file_name}", echo=True)
 
@@ -55,13 +56,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# ----- Models -----
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str
     hashed_password: str
     first_name: Optional[str] = None
-    last_name:  Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    about_me: Optional[str] = None
+    location: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    profile_photo_url: Optional[str] = None
 
 class Employer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -77,63 +83,66 @@ class JobListing(SQLModel, table=True):
     type: str
     experience: str
     salary: str
-    
+
 class Application(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     employer_id: int = Field(foreign_key="employer.id")
     job_listing_id: int = Field(foreign_key="joblisting.id")
     status: Optional[str] = Field(default="Submitted")
-    
+
+# Pydantic models for API
 class Credentials(BaseModel):
     username: str
     password: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
 
+class UpdateUser(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    about_me: Optional[str] = None
+    location: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    profile_photo_url: Optional[str] = None
+
+# ----- Auth/user routes -----
 @app.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(
-    creds: Credentials,                     
+    creds: Credentials,
     session: Session = Depends(get_session)
 ):
     if session.exec(select(User).where(User.username == creds.username)).first():
         raise HTTPException(409, "Username already taken")
     user = User(
         username=creds.username,
-        hashed_password=hash_pw(creds.password)
+        hashed_password=hash_pw(creds.password),
+        first_name=creds.first_name,
+        last_name=creds.last_name,
+        email=creds.email,
     )
     session.add(user)
     session.commit()
     session.refresh(user)
     token = create_token({"sub": creds.username})
-    return {"access_token": token, "token_type": "bearer"}
-
-
-def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    session: Session = Depends(get_session)
-) -> User:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-    except JWTError:
-        raise HTTPException(401, "Invalid token")
-    user = session.exec(select(User).where(User.username == username)).first()
-    if not user:
-        raise HTTPException(401, "User not found")
-    return user
-
-
-@app.post("/signup", status_code=status.HTTP_201_CREATED)
-def signup(
-    username: str,
-    password: str,
-    session: Session = Depends(get_session)
-):
-    if session.exec(select(User).where(User.username == username)).first():
-        raise HTTPException(409, "Username already taken")
-    user = User(username=username, hashed_password=hash_pw(password))
-    session.add(user); session.commit(); session.refresh(user)
-    token = create_token({"sub": username})
-    return {"access_token": token, "token_type": "bearer"}
+    # Return the new user object as well!
+    return {
+        "access_token": token,
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "about_me": user.about_me,
+            "location": user.location,
+            "linkedin_url": user.linkedin_url,
+            "profile_photo_url": user.profile_photo_url,
+        },
+        "token_type": "bearer"
+    }
 
 @app.post("/login")
 def login(
@@ -149,38 +158,44 @@ def login(
     return {
         "access_token": token,
         "user": {
-            "name": f"{user.first_name or ''} {user.last_name or ''}".strip(),
-            "username": user.username
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "username": user.username,
+            "email": user.email,
+            "about_me": user.about_me,
+            "location": user.location,
+            "linkedin_url": user.linkedin_url,
+            "profile_photo_url": user.profile_photo_url,
         }
     }
-
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-GOOGLE_REDIRECT_URI = "http://localhost:8000/google-callback"
-
-@app.get("/google-login")
-def google_login():
-    url = (
-        "https://accounts.google.com/o/oauth2/v2/auth"
-        f"?client_id={GOOGLE_CLIENT_ID}"
-        f"&redirect_uri={GOOGLE_REDIRECT_URI}"
-        "&response_type=code&scope=openid%20email%20profile"
-    )
-    return RedirectResponse(url)
-
-@app.get("/google-callback")
-def google_callback(code: str):
-    # still needa implement the google authentication
-    return {"detail": "Google OAuth flow not implemented in this demo"}
-
-
-@app.post("/users", response_model=User)
-def create_user(user: User, session: Session = Depends(get_session)):
-    session.add(user); session.commit(); session.refresh(user)
-    return user
 
 @app.get("/users", response_model=List[User])
 def read_users(session: Session = Depends(get_session)):
     return session.exec(select(User)).all()
+
+@app.get("/users/{user_id}", response_model=User)
+def read_user(user_id: int, session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(404, "User not found")
+    return user
+
+@app.put("/users/{user_id}", response_model=User)
+def update_user(
+    user_id: int,
+    user_data: UpdateUser,
+    session: Session = Depends(get_session)
+):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(404, "User not found")
+    user_data_dict = user_data.dict(exclude_unset=True)
+    for key, value in user_data_dict.items():
+        setattr(user, key, value)
+    session.commit()
+    session.refresh(user)
+    return user
 
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, session: Session = Depends(get_session)):
@@ -190,6 +205,21 @@ def delete_user(user_id: int, session: Session = Depends(get_session)):
     session.delete(user); session.commit()
     return {"ok": True}
 
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session)
+) -> User:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+    except JWTError:
+        raise HTTPException(401, "Invalid token")
+    user = session.exec(select(User).where(User.username == username)).first()
+    if not user:
+        raise HTTPException(401, "User not found")
+    return user
+
+# ----- Employers, Listings, Applications (no changes) -----
 @app.post("/employers", response_model=Employer)
 def create_employer(emp: Employer, session: Session = Depends(get_session)):
     session.add(emp); session.commit(); session.refresh(emp)
@@ -247,8 +277,7 @@ def delete_application(application_id: int, session: Session = Depends(get_sessi
     session.delete(application); session.commit()
     return {"ok": True}
 
-
-
+# ----- 3rd-party job APIs -----
 REMOTIVE_PRIMARY  = "https://remotive.com/api/remote-jobs"
 REMOTIVE_FALLBACK = "https://remotive.io/api/remote-jobs"
 
@@ -302,3 +331,24 @@ async def get_similar_jobs(
             for j in jobs
         ],
     }
+
+# ----- Google OAuth (unchanged, stub) -----
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_REDIRECT_URI = "http://localhost:8000/google-callback"
+
+@app.get("/google-login")
+def google_login():
+    url = (
+        "https://accounts.google.com/o/oauth2/v2/auth"
+        f"?client_id={GOOGLE_CLIENT_ID}"
+        f"&redirect_uri={GOOGLE_REDIRECT_URI}"
+        "&response_type=code&scope=openid%20email%20profile"
+    )
+    return RedirectResponse(url)
+
+@app.get("/google-callback")
+def google_callback(code: str):
+    # still needa implement the google authentication
+    return {"detail": "Google OAuth flow not implemented in this demo"}
+
+
