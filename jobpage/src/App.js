@@ -1,6 +1,7 @@
-import ProtectedRoute from "./components/ProtectedRoute";
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Chatbot from "./components/Chatbot";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -11,33 +12,22 @@ export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [user, setUser] = useState(() => {
     try {
-      const stored = localStorage.getItem("user");
-      return stored ? JSON.parse(stored) : null;
+      return JSON.parse(localStorage.getItem("user")) || null;
     } catch {
       return null;
     }
   });
+  const [lastSearch, setLastSearch] = useState("");
 
-  // Update state if localStorage changes in another tab/window
   useEffect(() => {
-    const handleStorageChange = () => {
+    const h = () => {
       setToken(localStorage.getItem("token"));
-      const storedUser = localStorage.getItem("user");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
+      const u = localStorage.getItem("user");
+      setUser(u ? JSON.parse(u) : null);
     };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener("storage", h);
+    return () => window.removeEventListener("storage", h);
   }, []);
-
-  // On mount, if token/user are in localStorage but not in state, sync them (for reload)
-  useEffect(() => {
-    if (!token && localStorage.getItem("token")) {
-      setToken(localStorage.getItem("token"));
-    }
-    if (!user && localStorage.getItem("user")) {
-      setUser(JSON.parse(localStorage.getItem("user")));
-    }
-  }, [token, user]);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -49,7 +39,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* public pages */}
         <Route
           path="/"
           element={
@@ -62,11 +51,23 @@ export default function App() {
             />
           }
         />
-        <Route path="/login" element={<Login setToken={setToken} setUser={setUser} />} />
-        <Route path="/signup" element={<Signup setToken={setToken} setUser={setUser} />} />
-        <Route path="/search" element={<Home />} />
-
-        {/* protected dashboard page */}
+        <Route
+          path="/login"
+          element={<Login setToken={setToken} setUser={setUser} />}
+        />
+        <Route
+          path="/signup"
+          element={<Signup setToken={setToken} setUser={setUser} />}
+        />
+        <Route
+          path="/search"
+          element={
+            <Home
+              logout={token ? logout : () => {}}
+              onSearch={term => setLastSearch(term)}
+            />
+          }
+        />
         <Route
           path="/dashboard"
           element={
@@ -75,11 +76,10 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* fallback route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      <Chatbot lastSearch={lastSearch} />
     </BrowserRouter>
   );
 }
-
