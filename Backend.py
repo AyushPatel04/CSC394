@@ -108,41 +108,77 @@ class UpdateUser(BaseModel):
     linkedin_url: Optional[str] = None
     profile_photo_url: Optional[str] = None
 
+class SignupAttempt(BaseModel):
+    username: str
+    password: str
+    role: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    employer_name: Optional[str] = None
+
 # ----- Auth/user routes -----
 @app.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(
-    creds: Credentials,
+    attempt: SignupAttempt,
     session: Session = Depends(get_session)
 ):
-    if session.exec(select(User).where(User.username == creds.username)).first():
+    existing_user = session.exec(select(User).where(User.username == attempt.username)).first()
+    existing_employer = session.exec(select(Employer).where(Employer.username == attempt.username)).first()
+    if existing_user or existing_employer:
         raise HTTPException(409, "Username already taken")
-    user = User(
-        username=creds.username,
-        hashed_password=hash_pw(creds.password),
-        first_name=creds.first_name,
-        last_name=creds.last_name,
-        email=creds.email,
-    )
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    token = create_token({"sub": creds.username})
-    # Return the new user object as well!
-    return {
-        "access_token": token,
-        "user": {
-            "id": user.id,
-            "username": user.username,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-            "about_me": user.about_me,
-            "location": user.location,
-            "linkedin_url": user.linkedin_url,
-            "profile_photo_url": user.profile_photo_url,
-        },
-        "token_type": "bearer"
-    }
+    
+    if attempt.role == "user":
+        user = User(
+            username=attempt.username,
+            hashed_password=hash_pw(attempt.password),
+            first_name=attempt.first_name,
+            last_name=attempt.last_name
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        token = create_token({"sub": attempt.username, "role": "user"})
+        # Return the new user object as well!
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "role": "user",
+                "id": user.id,
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "about_me": user.about_me,
+                "location": user.location,
+                "linkedin_url": user.linkedin_url,
+                "profile_photo_url": user.profile_photo_url,
+            }
+        }
+    
+    elif attempt.role == "employer":
+        employer = Employer(
+            username=attempt.username,
+            hashed_password=hash_pw(attempt.password),
+            employer_name=attempt.employer_name
+        )
+        session.add(employer)
+        session.commit()
+        session.refresh(employer)
+        token = create_token({"sub": attempt.username, "role": "employer"})
+        return {
+            "access_token": token, 
+            "token_type": "bearer",
+            "employer": {
+                "role": "employer",
+                "id": employer.id,
+                "employer_name": employer.employer_name,
+                "username": employer.username
+            }
+        }
+    
+    else:
+        raise HTTPException(400, "Invalid role")
 
 @app.post("/login")
 def login(
@@ -150,25 +186,40 @@ def login(
     session: Session = Depends(get_session)
 ):
     user = session.exec(select(User).where(User.username == form.username)).first()
-    if not user or not verify_pw(form.password, user.hashed_password):
-        raise HTTPException(401, "Invalid credentials")
+    if user and verify_pw(form.password, user.hashed_password):
+        token = create_token({"sub": user.username, "role": "user"})
 
-    token = create_token({"sub": user.username})
-
-    return {
-        "access_token": token,
-        "user": {
-            "id": user.id,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "username": user.username,
-            "email": user.email,
-            "about_me": user.about_me,
-            "location": user.location,
-            "linkedin_url": user.linkedin_url,
-            "profile_photo_url": user.profile_photo_url,
+        return {
+            "access_token": token,
+            "user": {
+                "role": "user",
+                "id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "username": user.username,
+                "email": user.email,
+                "about_me": user.about_me,
+                "location": user.location,
+                "linkedin_url": user.linkedin_url,
+                "profile_photo_url": user.profile_photo_url,
+            }
         }
-    }
+    
+    employer = session.exec(select(Employer).where(Employer.username == form.username)).first()
+    if employer and verify_pw(form.password, employer.hashed_password):
+        token = create_token({"sub": employer.username, "role": "employer"})
+
+        return {
+            "access_token": token,
+            "user": {
+                "role": "employer",
+                "id": employer.id,
+                "employer_name": employer.employer_name,
+                "username": employer.username
+            }
+        }
+    
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
 @app.get("/users", response_model=List[User])
 def read_users(session: Session = Depends(get_session)):

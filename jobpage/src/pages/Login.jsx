@@ -32,7 +32,14 @@ export default function Login({ setToken, setUser }) {
         setToken(data.access_token);
         setUser(data.user);
 
-        nav("/dashboard");
+        //nav("/dashboard");
+        if (data.user.role === "employer") {
+          nav("/employer/dashboard");
+        } else if (data.user.role === "user") {
+          nav("/user/dashboard");
+        } else {            
+          nav("/");
+  }
       })
       .catch((e) => {
         console.error("Login error:", e);
@@ -69,6 +76,13 @@ export default function Login({ setToken, setUser }) {
         No account?{" "}
         <Link to="/signup" className="underline text-primary">
           Sign up
+        </Link>
+      </p>
+
+      <p className="mt-4 text-center text-sm">
+        Back to{" "}
+        <Link to="/welcome" className="underline text-primary">
+          Home
         </Link>
       </p>
     </div>

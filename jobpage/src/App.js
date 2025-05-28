@@ -6,7 +6,8 @@ import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
+import UserDashboard from "./pages/user/Dashboard";
+import EmployerDashboard from "./pages/employer/Dashboard";
 
 export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
@@ -68,6 +69,8 @@ export default function App() {
             />
           }
         />
+        
+        {/*
         <Route
           path="/dashboard"
           element={
@@ -76,6 +79,28 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        */}
+
+        {/* protected user dashboard */}
+        <Route
+          path="/user/dashboard"
+          element={
+            <ProtectedRoute token={token}>
+              <UserDashboard user={user} logout={logout} setUser={setUser} />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* protected employer dashboard */}
+        <Route
+          path="/employer/dashboard"
+          element={
+            <ProtectedRoute token={token}>
+              <EmployerDashboard user={user} logout={logout} setUser={setUser} />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

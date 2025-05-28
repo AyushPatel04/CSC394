@@ -7,23 +7,45 @@ export default function Signup({ setToken, setUser }) {
 
   const [user, setUserInput] = useState("");
   const [pw, setPw] = useState("");
+  const [role,   setRole]   = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [employerName, setEmployerName] = useState("");
   const [err, setErr] = useState(null);
 
   const submit = e => {
     e.preventDefault();
 
+    const data = {
+      username: user,
+      password: pw,
+      role,
+      ...(role === "user" && { first_name: firstName, last_name: lastName }),
+      ...(role === "employer" && { employer_name: employerName })
+    }
+
     fetch("http://localhost:8000/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: user, password: pw })
+      body: JSON.stringify(data)
     })
       .then(r => (r.ok ? r.json() : Promise.reject()))
       .then(d => {
+        const account = d.user || d.employer;
         localStorage.setItem("token", d.access_token);
-        localStorage.setItem("user", JSON.stringify(d.user)); // Save user object!
+        localStorage.setItem("user", JSON.stringify(account)); // Save user object!
         setToken(d.access_token);
-        setUser(d.user); // Update app state
-        nav("/dashboard"); // Go to dashboard directly!
+        setUser(account);
+        //setUser(d.user); // Update app state
+        //nav("/dashboard"); // Go to dashboard directly!
+
+        if (account.role === "user") {
+          nav("/user/dashboard");
+        } else if (account.role === "employer") {
+          nav("/employer/dashboard");
+        } else {
+          nav("/"); // fallback
+        }
       })
       .catch(() => setErr("Username already taken"));
   };
@@ -50,13 +72,64 @@ export default function Signup({ setToken, setUser }) {
           className="w-full p-3 border rounded-md"
           required
         />
+
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="w-full p-3 border rounded-md"
+          required
+        >
+          <option value="">Select account type</option>
+          <option value="user">Job Seeker</option>
+          <option value="employer">Employer</option>
+        </select>
+
+        { // User Fields
+        role === "user" && (
+          <>
+            <input
+              value={firstName}
+              onChange={e => setFirstName(e.target.value)}
+              placeholder="First Name"
+              className="w-full p-3 border rounded-md"
+              required
+            />
+            <input
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+              placeholder="Last Name"
+              className="w-full p-3 border rounded-md"
+              required
+            />
+          </>
+        )}
+
+        { // Employer Fields
+        role === "employer" && (
+          <input
+            value={employerName}
+            onChange={e => setEmployerName(e.target.value)}
+            placeholder="Employer Name"
+            className="w-full p-3 border rounded-md"
+            required
+          />
+        )}
+
         <JbwButton className="w-full">Create account</JbwButton>
+        
       </form>
 
       <p className="mt-4 text-center text-sm">
         Have an account?{" "}
         <Link to="/login" className="underline text-primary">
           Log in
+        </Link>
+      </p>
+
+      <p className="mt-4 text-center text-sm">
+        Back to{" "}
+        <Link to="/welcome" className="underline text-primary">
+          Home
         </Link>
       </p>
     </div>
