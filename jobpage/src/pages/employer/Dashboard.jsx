@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
 export default function Dashboard({ logout }) {
@@ -8,6 +9,11 @@ export default function Dashboard({ logout }) {
     employer_name: "",
     username: "",
   });
+
+  const [listings, setListings] = useState([]);
+  const [listingsLoading, setListingsLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     try {
@@ -20,6 +26,23 @@ export default function Dashboard({ logout }) {
     } catch {
       setEmployer(null);
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/listings");
+        const data = await res.json();
+        const userId = JSON.parse(localStorage.getItem("user"))?.id;
+        const userListings = data.listings.filter(job => job.employer_id === userId);
+        setListings(userListings);
+      } catch (err) {
+        console.error("Failed to fetch listings", err);
+      } finally {
+        setListingsLoading(false);
+      }
+    };
+    fetchListings();
   }, []);
 
   const handleEdit = () => setEditing(true);
@@ -65,7 +88,24 @@ export default function Dashboard({ logout }) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-6xl mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold mb-6">Welcome to your Dashboard</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Welcome to your Dashboard</h1>
+          <div className="space-x-2">
+            <button
+              onClick={() => navigate("/home")}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Home
+            </button>
+            <button
+              onClick={logout}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+
         <p className="mb-8">
           Track your applications, saved jobs, and account info below.
         </p>
@@ -74,16 +114,7 @@ export default function Dashboard({ logout }) {
           {/* Sidebar */}
           <div className="bg-white rounded-lg shadow p-4 space-y-4">
             <div className="text-center">
-                {/*
-              <img
-                src={user.profile_photo_url || "https://via.placeholder.com/100"}
-                alt="Profile"
-                className="w-24 h-24 rounded-full mx-auto"
-              />
-                */}
-              <h2 className="font-bold">
-                {employer.employer_name}
-              </h2>
+              <h2 className="font-bold">{employer.employer_name}</h2>
               <p className="text-teal-700">@{employer.username || "yourusername"}</p>
             </div>
             <nav className="space-y-2 text-sm">
@@ -119,27 +150,6 @@ export default function Dashboard({ logout }) {
               {!editing ? (
                 <div>
                   <div><b>Employer Name:</b> {employer.employer_name}</div>
-                    {/*
-                  <div><b>Full Name:</b> {(user.first_name || "") + " " + (user.last_name || "")}</div>
-                  <div><b>Email:</b> {user.email || <span className="text-gray-400">Not set</span>}</div>
-                  <div><b>About Me:</b> {user.about_me || <span className="text-gray-400">Not set</span>}</div>
-                  <div><b>Location:</b> {user.location || <span className="text-gray-400">Not set</span>}</div>
-                  <div>
-                    <b>LinkedIn:</b>{" "}
-                    {user.linkedin_url ? (
-                      <a
-                        href={user.linkedin_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#14B8A6] underline"
-                      >
-                        {user.linkedin_url}
-                      </a>
-                    ) : (
-                      <span className="text-gray-400">Not set</span>
-                    )}
-                  </div>
-                    */}
                 </div>
               ) : (
                 <form onSubmit={handleSave} className="space-y-2">
@@ -150,67 +160,7 @@ export default function Dashboard({ logout }) {
                     placeholder="Employer Name"
                     className="border p-2 rounded w-full"
                     disabled={loading}
-                    />  
-                    {/*
-                  <div className="flex gap-2">
-                    <input
-                      name="first_name"
-                      value={form.first_name}
-                      onChange={handleChange}
-                      placeholder="First Name"
-                      className="border p-2 rounded w-1/2"
-                      disabled={loading}
-                    />
-                    <input
-                      name="last_name"
-                      value={form.last_name}
-                      onChange={handleChange}
-                      placeholder="Last Name"
-                      className="border p-2 rounded w-1/2"
-                      disabled={loading}
-                    />
-                  </div>
-                  <input
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="Email"
-                    className="border p-2 rounded w-full"
-                    disabled={loading}
                   />
-                  <input
-                    name="location"
-                    value={form.location}
-                    onChange={handleChange}
-                    placeholder="Location"
-                    className="border p-2 rounded w-full"
-                    disabled={loading}
-                  />
-                  <input
-                    name="linkedin_url"
-                    value={form.linkedin_url}
-                    onChange={handleChange}
-                    placeholder="LinkedIn URL"
-                    className="border p-2 rounded w-full"
-                    disabled={loading}
-                  />
-                  <input
-                    name="profile_photo_url"
-                    value={form.profile_photo_url}
-                    onChange={handleChange}
-                    placeholder="Profile Photo URL"
-                    className="border p-2 rounded w-full"
-                    disabled={loading}
-                  />
-                  <textarea
-                    name="about_me"
-                    value={form.about_me}
-                    onChange={handleChange}
-                    placeholder="About Me"
-                    className="border p-2 rounded w-full"
-                    disabled={loading}
-                  />
-                    */}
                   <div className="flex gap-2">
                     <button
                       type="submit"
@@ -231,7 +181,8 @@ export default function Dashboard({ logout }) {
                 </form>
               )}
             </section>
-            {/* Applications & Saved Jobs - keep as before */}
+
+            {/* Applications & Saved Jobs */}
             <section>
               <h3 className="text-lg font-semibold mb-2">Your Applications</h3>
               <p className="text-sm text-gray-600">No applications to display yet.</p>
@@ -240,10 +191,34 @@ export default function Dashboard({ logout }) {
               <h3 className="text-lg font-semibold mb-2">Saved Jobs</h3>
               <p className="text-sm text-gray-600">You haven't saved any jobs yet.</p>
             </section>
+
+            {/* Job Listings */}
+            <section>
+              <h3 className="text-lg font-semibold mb-2">Your Job Listings</h3>
+              {listingsLoading ? (
+                <p className="text-sm text-gray-500">Loading your listings...</p>
+              ) : listings.length === 0 ? (
+                <p className="text-sm text-gray-500">You haven't posted any jobs yet.</p>
+              ) : (
+                <ul className="space-y-4">
+                  {listings.map((job) => (
+                    <li key={job.id} className="border p-4 rounded shadow">
+                      <h4 className="font-semibold text-lg">{job.title}</h4>
+                      <p className="text-sm text-gray-600">{job.location} • {job.type}</p>
+                      <button
+                        onClick={() => navigate(`/listing/${job.id}`)}
+                        className="mt-2 inline-block bg-blue-600 text-white px-3 py-1 rounded"
+                      >
+                        View Listing
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
