@@ -1,45 +1,21 @@
-import { Link, useNavigate } from "react-router-dom";
-import NavBar from "../components/NavBar";
-import JbwButton from "../components/buttons";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Welcome({ token, setToken, logout }) {
+export default function AppliedJobs() {
   const navigate = useNavigate();
 
   return (
-    <>
-      <NavBar token={token} onLogout={logout} />
-
-      <main className="max-w-4xl mx-auto text-center p-10">
-        <h1 className="text-4xl font-extrabold text-primary mb-4">
-          Find your dream remote job.
-        </h1>
-        <p className="text-gray-700 mb-8">
-          JobberWobber lets you search thousands of remote tech positions in
-          seconds — no account required. Sign up to save your favorites and get
-          personalized recommendations.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <JbwButton onClick={() => navigate("/home")} className="text-lg">
-            Search jobs
-          </JbwButton>
-
-          {!token && (
-            <Link
-              to="/signup"
-              className="text-lg underline text-primary hover:text-primaryHover flex items-center"
-            >
-              Create a free account →
-            </Link>
-          )}
-        </div>
-
-        <img
-          src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=960&q=80"
-          alt="People working remotely"
-          className="rounded-lg shadow-lg mt-12 mx-auto"
-        />
-      </main>
-    </>
+    <div className="p-6 max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Applied Jobs</h2>
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+      <p className="text-gray-600">You have not applied to any jobs yet.</p>
+    </div>
   );
 }
