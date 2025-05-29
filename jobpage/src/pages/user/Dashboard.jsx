@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Dashboard({ logout }) {
+export default function Dashboard({ logout, showProfileEditor }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     first_name: "",
@@ -32,9 +33,6 @@ export default function Dashboard({ logout }) {
     }
   }, []);
 
-  const handleEdit = () => setEditing(true);
-  const handleCancel = () => setEditing(false);
-
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -56,7 +54,7 @@ export default function Dashboard({ logout }) {
       const updated = await res.json();
       setUser(updated);
       localStorage.setItem("user", JSON.stringify(updated));
-      setEditing(false);
+      navigate("/dashboard");
     } catch (err) {
       alert("Error updating profile.");
     } finally {
@@ -89,20 +87,20 @@ export default function Dashboard({ logout }) {
                 alt="Profile"
                 className="w-24 h-24 rounded-full mx-auto"
               />
-              <h2 className="font-bold">
-                {(user.first_name || "") + " " + (user.last_name || "")}
-              </h2>
-              <p className="text-teal-700">@{user.username || "yourusername"}</p>
-            </div>
-            <nav className="space-y-2 text-sm">
-              <button className="block w-full text-left hover:text-[#14B8A6]">
-                Dashboard
-              </button>
+              <h2 className="font-bold">{`${user.first_name || ""} ${user.last_name || ""}`}</h2>
+              <p className="text-teal-700">@{user.username}</p>
+
               <button
-                className="block w-full text-left hover:text-[#14B8A6]"
-                onClick={handleEdit}
+                className="mt-3 text-sm text-[#14B8A6] underline"
+                onClick={() => navigate("/dashboard/profile")}
               >
                 Edit Profile
+              </button>
+            </div>
+
+            <nav className="space-y-2 text-sm mt-6">
+              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/")}>
+                Home
               </button>
               <button className="block w-full text-left hover:text-[#14B8A6]">
                 Applied Jobs
@@ -121,32 +119,9 @@ export default function Dashboard({ logout }) {
 
           {/* Main Content */}
           <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
-            {/* Profile Section */}
-            <section>
-              <h3 className="text-lg font-semibold mb-2">Profile</h3>
-              {!editing ? (
-                <div>
-                  <div><b>Full Name:</b> {(user.first_name || "") + " " + (user.last_name || "")}</div>
-                  <div><b>Email:</b> {user.email || <span className="text-gray-400">Not set</span>}</div>
-                  <div><b>About Me:</b> {user.about_me || <span className="text-gray-400">Not set</span>}</div>
-                  <div><b>Location:</b> {user.location || <span className="text-gray-400">Not set</span>}</div>
-                  <div>
-                    <b>LinkedIn:</b>{" "}
-                    {user.linkedin_url ? (
-                      <a
-                        href={user.linkedin_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#14B8A6] underline"
-                      >
-                        {user.linkedin_url}
-                      </a>
-                    ) : (
-                      <span className="text-gray-400">Not set</span>
-                    )}
-                  </div>
-                </div>
-              ) : (
+            {showProfileEditor ? (
+              <section>
+                <h3 className="text-lg font-semibold mb-2">Edit Profile</h3>
                 <form onSubmit={handleSave} className="space-y-2">
                   <div className="flex gap-2">
                     <input
@@ -216,7 +191,7 @@ export default function Dashboard({ logout }) {
                     </button>
                     <button
                       type="button"
-                      onClick={handleCancel}
+                      onClick={() => navigate("/dashboard")}
                       className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
                       disabled={loading}
                     >
@@ -224,17 +199,19 @@ export default function Dashboard({ logout }) {
                     </button>
                   </div>
                 </form>
-              )}
-            </section>
-            {/* Applications & Saved Jobs - keep as before */}
-            <section>
-              <h3 className="text-lg font-semibold mb-2">Your Applications</h3>
-              <p className="text-sm text-gray-600">No applications to display yet.</p>
-            </section>
-            <section>
-              <h3 className="text-lg font-semibold mb-2">Saved Jobs</h3>
-              <p className="text-sm text-gray-600">You haven't saved any jobs yet.</p>
-            </section>
+              </section>
+            ) : (
+              <>
+                <section>
+                  <h3 className="text-lg font-semibold mb-2">Your Applications</h3>
+                  <p className="text-sm text-gray-600">No applications to display yet.</p>
+                </section>
+                <section>
+                  <h3 className="text-lg font-semibold mb-2">Saved Jobs</h3>
+                  <p className="text-sm text-gray-600">You haven't saved any jobs yet.</p>
+                </section>
+              </>
+            )}
           </div>
         </div>
       </div>
