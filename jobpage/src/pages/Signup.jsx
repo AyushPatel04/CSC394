@@ -7,7 +7,7 @@ export default function Signup({ setToken, setUser }) {
 
   const [user, setUserInput] = useState("");
   const [pw, setPw] = useState("");
-  const [role,   setRole]   = useState("");
+  const [role, setRole] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [employerName, setEmployerName] = useState("");
@@ -15,6 +15,7 @@ export default function Signup({ setToken, setUser }) {
 
   const submit = e => {
     e.preventDefault();
+    setErr(null); // Clear any previous errors
 
     const data = {
       username: user,
@@ -22,32 +23,37 @@ export default function Signup({ setToken, setUser }) {
       role,
       ...(role === "user" && { first_name: firstName, last_name: lastName }),
       ...(role === "employer" && { employer_name: employerName })
-    }
+    };
 
     fetch("http://localhost:8000/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     })
-      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(async (r) => {
+        if (!r.ok) {
+          const errData = await r.json().catch(() => null);
+          const message = errData?.detail || "Signup failed";
+          throw new Error(message);
+        }
+        return r.json();
+      })
       .then(d => {
         const account = d.user || d.employer;
         localStorage.setItem("token", d.access_token);
-        localStorage.setItem("user", JSON.stringify(account)); // Save user object!
+        localStorage.setItem("user", JSON.stringify(account));
         setToken(d.access_token);
         setUser(account);
-        //setUser(d.user); // Update app state
-        //nav("/dashboard"); // Go to dashboard directly!
 
         if (account.role === "user") {
           nav("/user/dashboard");
         } else if (account.role === "employer") {
           nav("/employer/dashboard");
         } else {
-          nav("/"); // fallback
+          nav("/");
         }
       })
-      .catch(() => setErr("Username already taken"));
+      .catch((err) => setErr(err.message || "Signup failed"));
   };
 
   return (
@@ -84,8 +90,7 @@ export default function Signup({ setToken, setUser }) {
           <option value="employer">Employer</option>
         </select>
 
-        { // User Fields
-        role === "user" && (
+        {role === "user" && (
           <>
             <input
               value={firstName}
@@ -104,8 +109,7 @@ export default function Signup({ setToken, setUser }) {
           </>
         )}
 
-        { // Employer Fields
-        role === "employer" && (
+        {role === "employer" && (
           <input
             value={employerName}
             onChange={e => setEmployerName(e.target.value)}
@@ -116,7 +120,6 @@ export default function Signup({ setToken, setUser }) {
         )}
 
         <JbwButton className="w-full">Create account</JbwButton>
-        
       </form>
 
       <p className="mt-4 text-center text-sm">
@@ -135,4 +138,3 @@ export default function Signup({ setToken, setUser }) {
     </div>
   );
 }
-
