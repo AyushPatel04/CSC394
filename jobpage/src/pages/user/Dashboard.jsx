@@ -102,10 +102,10 @@ export default function Dashboard({ logout, showProfileEditor }) {
               <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/")}>
                 Home
               </button>
-              <button className="block w-full text-left hover:text-[#14B8A6]">
+              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/dashboard/applied")}>
                 Applied Jobs
               </button>
-              <button className="block w-full text-left hover:text-[#14B8A6]">
+              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/dashboard/saved")}>
                 Saved Jobs
               </button>
               <button
@@ -218,4 +218,3 @@ export default function Dashboard({ logout, showProfileEditor }) {
     </div>
   );
 }
-
