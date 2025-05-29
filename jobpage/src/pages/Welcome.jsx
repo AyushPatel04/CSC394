@@ -1,8 +1,10 @@
-import { Link } from "react-router-dom";
-import NavBar    from "../components/NavBar";
+import { Link, useNavigate } from "react-router-dom";
+import NavBar from "../components/NavBar";
 import JbwButton from "../components/buttons";
 
 export default function Welcome({ token, setToken, logout }) {
+  const navigate = useNavigate();
+
   return (
     <>
       <NavBar token={token} onLogout={logout} />
@@ -18,7 +20,7 @@ export default function Welcome({ token, setToken, logout }) {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <JbwButton as={Link} to="/search" className="text-lg">
+          <JbwButton onClick={() => navigate("/home")} className="text-lg">
             Search jobs
           </JbwButton>
 
@@ -32,12 +34,11 @@ export default function Welcome({ token, setToken, logout }) {
           )}
         </div>
 
-        {/* just grabbed a random image */}
         <img
-        src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=960&q=80"
-        alt="People working remotely"
-        className="rounded-lg shadow-lg mt-12 mx-auto"
-/>
+          src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=960&q=80"
+          alt="People working remotely"
+          className="rounded-lg shadow-lg mt-12 mx-auto"
+        />
       </main>
     </>
   );
