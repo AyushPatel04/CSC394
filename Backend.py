@@ -402,4 +402,10 @@ def google_callback(code: str):
     # still needa implement the google authentication
     return {"detail": "Google OAuth flow not implemented in this demo"}
 
-
+@app.get("/debug/usernames")
+def get_usernames(session: Session = Depends(get_session)):
+    users = session.exec(select(User)).all()
+    employers = session.exec(select(Employer)).all()
+    return {
+        "usernames": [u.username for u in users + employers]
+    }
