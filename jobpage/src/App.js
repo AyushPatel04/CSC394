@@ -1,37 +1,50 @@
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
-import Dashboard from "./pages/user/Dashboard";
+import UserDashboard from "./pages/user/Dashboard";
+import EmployerDashboard from "./pages/employer/Dashboard";
 
 function AppRoutes({ token, logout }) {
   const location = useLocation();
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const role = user?.role || "user"; // fallback to "user"
 
-  // Check if route ends in /profile
   const showProfileEditor = location.pathname === "/dashboard/profile";
 
   return (
     <Routes>
-      {/* public pages */}
+      {/* Public pages */}
       <Route path="/" element={<Welcome token={token} logout={logout} />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/home" element={<Home />} />
 
-      {/* protected routes */}
+      {/* Protected dashboards */}
       <Route
         path="/dashboard/*"
         element={
           <ProtectedRoute token={token}>
-            <Dashboard logout={logout} showProfileEditor={showProfileEditor} />
+            {role === "employer" ? (
+              <EmployerDashboard logout={logout} />
+            ) : (
+              <UserDashboard logout={logout} showProfileEditor={showProfileEditor} />
+            )}
           </ProtectedRoute>
         }
       />
 
-      {/* fallback */}
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -48,6 +61,7 @@ export default function App() {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setToken(null);
   };
 
