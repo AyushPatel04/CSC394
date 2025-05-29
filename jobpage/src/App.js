@@ -1,3 +1,4 @@
+import ViewListing from './components/ViewListing';
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useState, useEffect } from "react";
 import {
@@ -7,18 +8,21 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
+
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import UserDashboard from "./pages/user/Dashboard";
 import EmployerDashboard from "./pages/employer/Dashboard";
+import AppliedJobs from "./components/AppliedJobs.jsx";
+import SavedJobs from "./components/SavedJobs.jsx";
 
-function AppRoutes({ token, logout }) {
+function AppRoutes({ token, logout, setToken, setUser }) {
   const location = useLocation();
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
-  const role = user?.role || "user"; // fallback to "user"
+  const role = user?.role || "user";
 
   const showProfileEditor = location.pathname === "/dashboard/profile";
 
@@ -26,9 +30,10 @@ function AppRoutes({ token, logout }) {
     <Routes>
       {/* Public pages */}
       <Route path="/" element={<Welcome token={token} logout={logout} />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login setToken={setToken} setUser={setUser} />} />
+      <Route path="/signup" element={<Signup setToken={setToken} setUser={setUser} />} />
       <Route path="/home" element={<Home />} />
+      <Route path="/listing/:id" element={<ViewListing />} />
 
       {/* Protected dashboards */}
       <Route
@@ -43,6 +48,8 @@ function AppRoutes({ token, logout }) {
           </ProtectedRoute>
         }
       />
+      <Route path="/dashboard/applied" element={<AppliedJobs />} />
+      <Route path="/dashboard/saved" element={<SavedJobs />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -52,9 +59,17 @@ function AppRoutes({ token, logout }) {
 
 export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   useEffect(() => {
-    const h = () => setToken(localStorage.getItem("token"));
+    const h = () => {
+      setToken(localStorage.getItem("token"));
+      const updatedUser = localStorage.getItem("user");
+      setUser(updatedUser ? JSON.parse(updatedUser) : null);
+    };
     window.addEventListener("storage", h);
     return () => window.removeEventListener("storage", h);
   }, []);
@@ -63,12 +78,12 @@ export default function App() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);
+    setUser(null);
   };
 
   return (
     <BrowserRouter>
-      <AppRoutes token={token} logout={logout} />
+      <AppRoutes token={token} logout={logout} setToken={setToken} setUser={setUser} />
     </BrowserRouter>
   );
 }
-
