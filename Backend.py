@@ -68,6 +68,7 @@ class User(SQLModel, table=True):
     location: Optional[str] = None
     linkedin_url: Optional[str] = None
     profile_photo_url: Optional[str] = None
+    resume: Optional[str] = None
 
 class Employer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -83,12 +84,14 @@ class JobListing(SQLModel, table=True):
     type: str
     experience: str
     salary: str
+    description: str
 
 class Application(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     employer_id: int = Field(foreign_key="employer.id")
     job_listing_id: int = Field(foreign_key="joblisting.id")
+    user_resume: str
     status: Optional[str] = Field(default="Submitted")
 
 # Pydantic models for API
