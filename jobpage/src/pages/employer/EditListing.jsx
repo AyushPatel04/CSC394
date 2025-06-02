@@ -122,7 +122,7 @@ export default function EditListing() {
                     <button
                         type="button"
                         onClick={() => navigate("/listings")}
-                        className="bg-[#14B8A6] text-white px-4 py-2 rounded hover:bg-teal-600"
+                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                         disabled={submitting}
                     >
                         Cancel
@@ -130,7 +130,7 @@ export default function EditListing() {
 
                     <button
                         type="submit"
-                        className="bg-[#14B8A6] text-white px-4 py-2 rounded hover:bg-teal-600"
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                         disabled={submitting}
                     >
                         {submitting ? "Updating..." : "Update Job Listing"}

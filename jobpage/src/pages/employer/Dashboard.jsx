@@ -10,8 +10,8 @@ export default function Dashboard({ logout }) {
     username: "",
   });
 
-  const [listings, setListings] = useState([]);
-  const [listingsLoading, setListingsLoading] = useState(true);
+  //const [listings, setListings] = useState([]);
+  //const [listingsLoading, setListingsLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -28,6 +28,7 @@ export default function Dashboard({ logout }) {
     }
   }, []);
 
+  /*
   useEffect(() => {
     const fetchListings = async () => {
       try {
@@ -44,6 +45,7 @@ export default function Dashboard({ logout }) {
     };
     fetchListings();
   }, []);
+  */
 
   const handleEdit = () => setEditing(true);
   const handleCancel = () => setEditing(false);
@@ -128,7 +130,7 @@ export default function Dashboard({ logout }) {
                 Edit Profile
               </button>
               <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/listings")}>
-                My Job Listings
+                Posted Jobs
               </button>
               <button className="block w-full text-left hover:text-[#14B8A6]">
                 Applications Received

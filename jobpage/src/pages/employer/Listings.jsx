@@ -27,15 +27,18 @@ export default function Listings() {
 
     return (
         <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">My Job Listings</h2>
-            <div className="flex gap-2 mb-6">
+            
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Posted Jobs</h2>
                 <button
                     onClick={() => navigate("/dashboard")}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 >
                     Back to Dashboard
                 </button>
-                
+            </div>
+
+            <div className="flex gap-2 mb-6">
                 <button
                     type="button"
                     onClick={() => navigate("/newlisting")}
