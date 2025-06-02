@@ -19,7 +19,7 @@ export default function Home({ logout }) {
 
     const url = q
       ? `/remote?q=${encodeURIComponent(q)}`
-      : `/listings`;
+      : `/jobcard`;
 
     fetch("http://localhost:8000" + url)
       .then(r => r.json())

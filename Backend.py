@@ -321,6 +321,21 @@ def create_listing(lst: JobListing, session: Session = Depends(get_session)):
 def get_listings(session: Session = Depends(get_session)):
     return session.exec(select(JobListing)).all()
 
+# GET all listings for job cards
+@app.get("/jobcard")
+def get_listings(session: Session = Depends(get_session)):
+    joined = session.exec(
+        select(JobListing, Employer.employer_name).join(Employer, Employer.id == JobListing.employer_id)
+    ).all()
+
+    listings = []
+    for listing, employer_name in joined:
+        data = listing.dict()
+        data["company"] = employer_name
+        listings.append(data)
+
+    return listings
+
 '''
 @app.get("/listings")
 def read_listings(
@@ -351,7 +366,7 @@ def update_listing(listing_id: int, updated_listing: JobListing, session: Sessio
     data = updated_listing.dict(exclude_unset=True, exclude={"id", "employer_id"})
     for key, value in data.items():
         setattr(listing, key, value)
-        
+
     session.add(listing)
     session.commit()
     session.refresh(listing)
