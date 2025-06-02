@@ -23,13 +23,27 @@ export default function Listings() {
             });
     }, []);
 
+    const handleDelete = async listingId => {
+        if (!window.confirm("Are you sure you want to delete this job listing?")) return;
+
+        try {
+            const res = await fetch(`http://localhost:8000/listings/${listingId}`, {
+                method: "DELETE",
+            });
+            if (!res.ok) throw new Error("Failed to delete job listing");
+            setListings((prev) => prev.filter((listing) => listing.id !== listingId));
+        } catch (err) {
+            alert("Error deleting job listing.");
+        }
+    };
+
     if (loading) return <div>Loading your job listings...</div>;
 
     return (
         <div className="p-4">
             
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Posted Jobs</h2>
+                <h2 className="text-2xl font-bold">Posted Job Listings</h2>
                 <button
                     onClick={() => navigate("/dashboard")}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -73,7 +87,7 @@ export default function Listings() {
 
                                 <button
                                     type="button"
-                                    //onClick={() => }
+                                    onClick={() => handleDelete(listing.id)}
                                     className="bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700"
                                 >
                                     Delete

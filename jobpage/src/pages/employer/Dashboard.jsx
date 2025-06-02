@@ -130,7 +130,7 @@ export default function Dashboard({ logout }) {
                 Edit Profile
               </button>
               <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/listings")}>
-                Posted Jobs
+                Posted Job Listings
               </button>
               <button className="block w-full text-left hover:text-[#14B8A6]">
                 Applications Received
