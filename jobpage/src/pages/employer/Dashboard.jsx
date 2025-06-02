@@ -107,7 +107,7 @@ export default function Dashboard({ logout }) {
         </div>
 
         <p className="mb-8">
-          Track your applications, saved jobs, and account info below.
+          Manage your job listings, received applications, and account info below.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -127,11 +127,11 @@ export default function Dashboard({ logout }) {
               >
                 Edit Profile
               </button>
-              <button className="block w-full text-left hover:text-[#14B8A6]">
-                Applied Jobs
+              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/employer/listings")}>
+                My Job Listings
               </button>
               <button className="block w-full text-left hover:text-[#14B8A6]">
-                Saved Jobs
+                Applications Received
               </button>
               <button
                 onClick={logout}
@@ -180,16 +180,6 @@ export default function Dashboard({ logout }) {
                   </div>
                 </form>
               )}
-            </section>
-
-            {/* Applications & Saved Jobs */}
-            <section>
-              <h3 className="text-lg font-semibold mb-2">Your Applications</h3>
-              <p className="text-sm text-gray-600">No applications to display yet.</p>
-            </section>
-            <section>
-              <h3 className="text-lg font-semibold mb-2">Saved Jobs</h3>
-              <p className="text-sm text-gray-600">You haven't saved any jobs yet.</p>
             </section>
 
             {/* Job Listings */}

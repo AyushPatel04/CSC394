@@ -283,6 +283,11 @@ def create_employer(emp: Employer, session: Session = Depends(get_session)):
 def read_employers(session: Session = Depends(get_session)):
     return session.exec(select(Employer)).all()
 
+# Get all job listings posted by an employer 
+@app.get("/employers/{employer_id}/listings", response_model=List[JobListing])
+def get_employer_listings(employer_id: int, session: Session = Depends(get_session)):
+    return session.exec(select(JobListing).where(JobListing.employer_id == employer_id)).all()
+
 @app.delete("/employers/{employer_id}")
 def delete_employer(employer_id: int, session: Session = Depends(get_session)):
     emp = session.get(Employer, employer_id)
@@ -296,6 +301,11 @@ def create_listing(lst: JobListing, session: Session = Depends(get_session)):
     session.add(lst); session.commit(); session.refresh(lst)
     return lst
 
+@app.get("/listings", response_model=List[JobListing])
+def get_listings(session: Session = Depends(get_session)):
+    return session.exec(select(JobListing)).all()
+
+'''
 @app.get("/listings")
 def read_listings(
     search: Optional[str] = None,
@@ -305,6 +315,7 @@ def read_listings(
     if search:
         stmt = stmt.where(JobListing.title.ilike(f"%{search}%"))
     return {"listings": session.exec(stmt).all()}
+'''
 
 @app.delete("/listings/{listing_id}")
 def delete_listing(listing_id: int, session: Session = Depends(get_session)):

@@ -17,6 +17,8 @@ import UserDashboard from "./pages/user/Dashboard";
 import EmployerDashboard from "./pages/employer/Dashboard";
 import AppliedJobs from "./components/AppliedJobs.jsx";
 import SavedJobs from "./components/SavedJobs.jsx";
+import EmployerListings from "./pages/employer/Listings.jsx";
+import NewListing from "./pages/employer/NewListing";
 
 function AppRoutes({ token, logout, setToken, setUser }) {
   const location = useLocation();
@@ -50,6 +52,25 @@ function AppRoutes({ token, logout, setToken, setUser }) {
       />
       <Route path="/dashboard/applied" element={<AppliedJobs />} />
       <Route path="/dashboard/saved" element={<SavedJobs />} />
+
+      {/* Employer protected routes */}
+      <Route
+        path="/employer/listings"
+        element={
+          <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
+            <EmployerListings/>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/employer/listings/new"
+        element={
+          <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
+            <NewListing/>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
