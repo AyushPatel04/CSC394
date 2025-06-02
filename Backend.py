@@ -15,6 +15,8 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 import httpx
 
+
+
 # ----- Auth config -----
 SECRET_KEY = os.getenv("JWT_SECRET", "dev-secret-change-me")
 ALGORITHM = "HS256"
@@ -32,6 +34,8 @@ def create_token(data: dict, minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES):
     to_encode = data.copy()
     to_encode["exp"] = datetime.utcnow() + timedelta(minutes=minutes)
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
 
 # ----- Database config -----
 sqlite_file_name = "jobs.db"
@@ -55,6 +59,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 
 # ----- Models -----
 class User(SQLModel, table=True):
@@ -118,6 +124,8 @@ class SignupAttempt(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     employer_name: Optional[str] = None
+
+
 
 # ----- Auth/user routes -----
 @app.post("/signup", status_code=status.HTTP_201_CREATED)
@@ -224,6 +232,8 @@ def login(
     
     raise HTTPException(status_code=401, detail="Invalid credentials")
 
+
+# ----- User endpoints -----
 @app.get("/users", response_model=List[User])
 def read_users(session: Session = Depends(get_session)):
     return session.exec(select(User)).all()
@@ -273,7 +283,9 @@ def get_current_user(
         raise HTTPException(401, "User not found")
     return user
 
-# ----- Employers, Listings, Applications (no changes) -----
+
+
+# ----- Employer endpoints -----
 @app.post("/employers", response_model=Employer)
 def create_employer(emp: Employer, session: Session = Depends(get_session)):
     session.add(emp); session.commit(); session.refresh(emp)
@@ -296,11 +308,15 @@ def delete_employer(employer_id: int, session: Session = Depends(get_session)):
     session.delete(emp); session.commit()
     return {"ok": True}
 
+
+
+# ----- Listing endpoints -----
 @app.post("/listings", response_model=JobListing)
 def create_listing(lst: JobListing, session: Session = Depends(get_session)):
     session.add(lst); session.commit(); session.refresh(lst)
     return lst
 
+# GET all listings
 @app.get("/listings", response_model=List[JobListing])
 def get_listings(session: Session = Depends(get_session)):
     return session.exec(select(JobListing)).all()
@@ -317,6 +333,30 @@ def read_listings(
     return {"listings": session.exec(stmt).all()}
 '''
 
+# GET listing by id
+@app.get("/listings/{listing_id}", response_model=JobListing)
+def get_listing(listing_id: int, session: Session = Depends(get_session)):
+    listing = session.get(JobListing, listing_id)
+    if not listing:
+        raise HTTPException(404, "Listing not found")
+    return listing
+
+# PUT update a listing
+@app.put("/listings/{listing_id}", response_model=JobListing)
+def update_listing(listing_id: int, updated_listing: JobListing, session: Session = Depends(get_session)):
+    listing = session.get(JobListing, listing_id)
+    if not listing:
+        raise HTTPException(404, "Listing not found")
+    
+    data = updated_listing.dict(exclude_unset=True, exclude={"id", "employer_id"})
+    for key, value in data.items():
+        setattr(listing, key, value)
+        
+    session.add(listing)
+    session.commit()
+    session.refresh(listing)
+    return listing
+
 @app.delete("/listings/{listing_id}")
 def delete_listing(listing_id: int, session: Session = Depends(get_session)):
     lst = session.get(JobListing, listing_id)
@@ -325,6 +365,9 @@ def delete_listing(listing_id: int, session: Session = Depends(get_session)):
     session.delete(lst); session.commit()
     return {"ok": True}
 
+
+
+# ----- Application endpoints -----
 @app.post("/applications", response_model=Application)
 def create_application(application: Application, session: Session = Depends(get_session)):
     session.add(application); session.commit(); session.refresh(application)
@@ -341,6 +384,8 @@ def delete_application(application_id: int, session: Session = Depends(get_sessi
         raise HTTPException(404, "Application not found")
     session.delete(application); session.commit()
     return {"ok": True}
+
+
 
 # ----- 3rd-party job APIs -----
 REMOTIVE_PRIMARY  = "https://remotive.com/api/remote-jobs"
@@ -396,6 +441,8 @@ async def get_similar_jobs(
             for j in jobs
         ],
     }
+
+
 
 # ----- Google OAuth (unchanged, stub) -----
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")

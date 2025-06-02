@@ -127,7 +127,7 @@ export default function Dashboard({ logout }) {
               >
                 Edit Profile
               </button>
-              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/employer/listings")}>
+              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/listings")}>
                 My Job Listings
               </button>
               <button className="block w-full text-left hover:text-[#14B8A6]">
@@ -183,6 +183,7 @@ export default function Dashboard({ logout }) {
             </section>
 
             {/* Job Listings */}
+            {/*
             <section>
               <h3 className="text-lg font-semibold mb-2">Your Job Listings</h3>
               {listingsLoading ? (
@@ -206,6 +207,7 @@ export default function Dashboard({ logout }) {
                 </ul>
               )}
             </section>
+            */}
           </div>
         </div>
       </div>

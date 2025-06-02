@@ -38,7 +38,7 @@ export default function Listings() {
                 
                 <button
                     type="button"
-                    onClick={() => navigate("/employer/listings/new")}
+                    onClick={() => navigate("/newlisting")}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 >
                     New Job Listing
@@ -49,13 +49,33 @@ export default function Listings() {
             ) : (
                 <ul className="space-y-4">
                     {listings.map((listing) => (
-                        <li key={listing.id} className="border p-4 rounded shadow">
-                            <h3 className="text-lg font-semibold">{listing.title}</h3>
-                            <p><strong>Location:</strong> {listing.location}</p>
-                            <p><strong>Type:</strong> {listing.type}</p>
-                            <p><strong>Experience:</strong> {listing.experience}</p>
-                            <p><strong>Salary:</strong> {listing.salary}</p>
-                            <p><strong>Description:</strong> {listing.description}</p>
+                        <li key={listing.id} className="border p-4 rounded shadow flex justify-between items-start">
+                            <div>
+                                <h3 className="text-lg font-semibold">{listing.title}</h3>
+                                <p><strong>Location:</strong> {listing.location}</p>
+                                <p><strong>Type:</strong> {listing.type}</p>
+                                <p><strong>Experience:</strong> {listing.experience}</p>
+                                <p><strong>Salary:</strong> {listing.salary}</p>
+                                <p><strong>Description:</strong> {listing.description}</p>
+                            </div>
+
+                            <div className="flex flex-col gap-2 ml-4">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate(`/editlisting/${listing.id}`)}
+                                    className="bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    type="button"
+                                    //onClick={() => }
+                                    className="bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700"
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </li>
                     ))}
                 </ul>

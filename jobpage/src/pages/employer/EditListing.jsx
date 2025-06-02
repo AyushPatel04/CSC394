@@ -1,8 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 
-export default function NewListing() {
+export default function EditListing() {
+    const { listingId } = useParams();
     const [submitting, setSubmitting] = useState(false);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [form, setForm] = useState({
         title: "",
@@ -13,6 +15,30 @@ export default function NewListing() {
         description: ""
     });
 
+    useEffect(() => {
+        const fetchListings = async () => {
+            try {
+                const res = await fetch(`http://localhost:8000/listings/${listingId}`);
+                if (!res.ok) throw new Error("Failed to fetch job listing");
+                const data = await res.json();
+                setForm({
+                    title: data.title || "",
+                    location: data.location || "",
+                    type: data.type || "",
+                    experience: data.experience || "",
+                    salary: data.salary || "",
+                    description: data.description || ""
+                });
+            } catch (err) {
+                alert("Error loading job listing.");
+                navigate("/listings");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchListings();
+    }, [listingId, navigate]);
+
     const handleChange = e => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
@@ -20,29 +46,28 @@ export default function NewListing() {
 
     const handleSubmit = async e => {
         e.preventDefault();
-        const employer = JSON.parse(localStorage.getItem("user"));
-        if (!employer?.id) return alert("Employer ID not found.");
-    
         setSubmitting(true);
         try {
-            const res = await fetch("http://localhost:8000/listings", {
-                method: "POST",
+            const res = await fetch(`http://localhost:8000/listings/${listingId}`, {
+                method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...form, employer_id: employer.id }),
+                body: JSON.stringify( form ),
             });
-            if (!res.ok) throw new Error("Failed to post job listing");
+            if (!res.ok) throw new Error("Failed to update job listing");
             await res.json();
             navigate("/listings");
         } catch (err) {
-            alert("Error posting job listing.");
+            alert("Error updating job listing.");
         } finally {
             setSubmitting(false);
         }
     };
 
+    if (loading) return <div>Loading your job listing...</div>;
+
     return (
         <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
-            <h3 className="text-lg font-semibold mb-2">New Job Listing</h3>
+            <h3 className="text-lg font-semibold mb-2">Edit Job Listing</h3>
             <form onSubmit={handleSubmit} className="space-y-2">
                 <input
                     name="title"
@@ -108,7 +133,7 @@ export default function NewListing() {
                         className="bg-[#14B8A6] text-white px-4 py-2 rounded hover:bg-teal-600"
                         disabled={submitting}
                     >
-                        {submitting ? "Posting..." : "Post Job Listing"}
+                        {submitting ? "Updating..." : "Update Job Listing"}
                     </button>
                 </div>
             </form>
