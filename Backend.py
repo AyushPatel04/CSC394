@@ -13,10 +13,13 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlmodel import SQLModel, Field, create_engine, Session, select
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+import openai
+from openai import AsyncOpenAI
+from dotenv import load_dotenv
 import httpx
 
-
-
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 # ----- Auth config -----
 SECRET_KEY = os.getenv("JWT_SECRET", "dev-secret-change-me")
 ALGORITHM = "HS256"
@@ -124,6 +127,10 @@ class SignupAttempt(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     employer_name: Optional[str] = None
+    
+class ChatRequest(BaseModel):
+    history: list[dict]           
+    last_search: str | None = None
 
 
 
@@ -402,7 +409,7 @@ def delete_application(application_id: int, session: Session = Depends(get_sessi
 
 
 
-# ----- 3rd-party job APIs -----
+
 REMOTIVE_PRIMARY  = "https://remotive.com/api/remote-jobs"
 REMOTIVE_FALLBACK = "https://remotive.io/api/remote-jobs"
 
@@ -459,7 +466,7 @@ async def get_similar_jobs(
 
 
 
-# ----- Google OAuth (unchanged, stub) -----
+
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_REDIRECT_URI = "http://localhost:8000/google-callback"
 
@@ -485,3 +492,44 @@ def get_usernames(session: Session = Depends(get_session)):
     return {
         "usernames": [u.username for u in users + employers]
     }
+@app.post("/chat")
+async def chat(req: ChatRequest):
+    system_prompt = (
+        "You are Jobby, a concise, friendly job-search assistant. "
+        "If you see a list of job titles, suggest actions or next steps."
+    )
+
+    messages = [{"role": "system", "content": system_prompt}] + req.history
+
+    
+    rec_summary = ""
+    if req.last_search:
+        jobs = await _query_remotive({"search": req.last_search, "limit": 3})
+        if jobs:
+            rec_summary = "\n".join(
+                f"- {j['title']} at {j['company_name']}" for j in jobs[:3]
+            )
+            messages.append(
+                {
+                    "role": "system",
+                    "content": f"User last searched: {req.last_search}\n"
+                               f"Here are some current matching openings:\n{rec_summary}",
+                }
+            )
+    
+    messages = [m for m in messages if m.get("content") not in (None, "", "null")]
+
+    client = AsyncOpenAI(api_key=openai.api_key)
+    try:
+        resp = await client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
+            max_tokens=120,
+            temperature=0.7,
+        )
+        reply = resp.choices[0].message.content.strip()
+    except Exception as e:
+        print("⚠️ OpenAI error:", e)
+        raise HTTPException(500, f"OpenAI error: {e}")
+
+    return {"reply": reply}
