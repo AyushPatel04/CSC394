@@ -20,6 +20,7 @@ import SavedJobs from "./components/SavedJobs.jsx";
 import EmployerListings from "./pages/employer/Listings";
 import NewListing from "./pages/employer/NewListing";
 import EditListing from "./pages/employer/EditListing";
+import Chatbot from "./components/Chatbot";          /* ← added */
 
 function AppRoutes({ token, logout, setToken, setUser }) {
   const location = useLocation();
@@ -59,7 +60,7 @@ function AppRoutes({ token, logout, setToken, setUser }) {
         path="/listings"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
-            <EmployerListings/>
+            <EmployerListings />
           </ProtectedRoute>
         }
       />
@@ -68,7 +69,7 @@ function AppRoutes({ token, logout, setToken, setUser }) {
         path="/newlisting"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
-            <NewListing/>
+            <NewListing />
           </ProtectedRoute>
         }
       />
@@ -77,7 +78,7 @@ function AppRoutes({ token, logout, setToken, setUser }) {
         path="/editlisting/:listingId"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
-            <EditListing/>
+            <EditListing />
           </ProtectedRoute>
         }
       />
@@ -90,6 +91,7 @@ function AppRoutes({ token, logout, setToken, setUser }) {
 
 export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+  // eslint-disable-next-line no-unused-vars
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
@@ -114,7 +116,15 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <AppRoutes token={token} logout={logout} setToken={setToken} setUser={setUser} />
+      <AppRoutes
+        token={token}
+        logout={logout}
+        setToken={setToken}
+        setUser={setUser}
+      />
+
+      {/* Chatbot appears on every page */}
+      <Chatbot />               {/* ← added */}
     </BrowserRouter>
   );
 }
