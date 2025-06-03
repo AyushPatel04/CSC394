@@ -4,7 +4,7 @@ import NavBar     from "../components/NavBar";
 import JbwButton  from "../components/buttons";      
 import JobCard    from "../components/JobCard";
 
-export default function Home({ logout }) {
+export default function Home({ logout, onSearch }) {   
   const nav = useNavigate();
 
   const [search, setSearch]  = useState("");
@@ -12,7 +12,6 @@ export default function Home({ logout }) {
   const [loading, setLoading]= useState(false);
   const [error,   setError]  = useState(null);
 
-  
   const fetchJobs = q => {
     setLoading(true);
     setError(null);
@@ -31,18 +30,20 @@ export default function Home({ logout }) {
       .finally(() => setLoading(false));
   };
 
-  
   useEffect(() => { fetchJobs(""); }, []);
 
-  
   return (
     <>
-      {/* shows the logout button in the navbar */}
       <NavBar token={true} onLogout={logout} />
 
       <main className="max-w-4xl mx-auto p-6">
         <form
-          onSubmit={e => { e.preventDefault(); fetchJobs(search.trim()); }}
+          onSubmit={e => {
+            e.preventDefault();
+            const q = search.trim();
+            onSearch?.(q);          
+            fetchJobs(q);
+          }}
           className="flex gap-2 mb-8"
         >
           <input

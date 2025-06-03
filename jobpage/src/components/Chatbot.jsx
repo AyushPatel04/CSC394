@@ -11,7 +11,12 @@ export default function Chatbot({ lastSearch }) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history, open]);
-
+  useEffect(() => {
+    if (open && history.length === 0) {
+     setHist([{ role: "assistant", content: "Hey I’m Jobber, You can ask me for any job suggestions or career help :)" }]);
+    }
+  }, 
+  [open, history.length]);
   const send = () => {
     if (!input.trim()) return;
     const newHist = [...history, { role: "user", content: input }];

@@ -20,9 +20,9 @@ import SavedJobs from "./components/SavedJobs.jsx";
 import EmployerListings from "./pages/employer/Listings";
 import NewListing from "./pages/employer/NewListing";
 import EditListing from "./pages/employer/EditListing";
-import Chatbot from "./components/Chatbot";          
+import Chatbot from "./components/Chatbot";
 
-function AppRoutes({ token, logout, setToken, setUser }) {
+function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
   const location = useLocation();
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
@@ -36,7 +36,10 @@ function AppRoutes({ token, logout, setToken, setUser }) {
       <Route path="/" element={<Welcome token={token} logout={logout} />} />
       <Route path="/login" element={<Login setToken={setToken} setUser={setUser} />} />
       <Route path="/signup" element={<Signup setToken={setToken} setUser={setUser} />} />
-      <Route path="/home" element={<Home />} />
+      <Route
+        path="/home"
+        element={<Home onSearch={term => setLastSearch(term)} />}
+      />
       <Route path="/listing/:id" element={<ViewListing />} />
 
       {/* Protected dashboards */}
@@ -64,7 +67,6 @@ function AppRoutes({ token, logout, setToken, setUser }) {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/newlisting"
         element={
@@ -73,7 +75,6 @@ function AppRoutes({ token, logout, setToken, setUser }) {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/editlisting/:listingId"
         element={
@@ -91,10 +92,12 @@ function AppRoutes({ token, logout, setToken, setUser }) {
 
 export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+  const [lastSearch, setLastSearch] = useState("");
 
   useEffect(() => {
     const h = () => {
@@ -120,14 +123,9 @@ export default function App() {
         logout={logout}
         setToken={setToken}
         setUser={setUser}
+        setLastSearch={setLastSearch}
       />
-
-      {
-    
-    }
-      <Chatbot />               {
-
-      }
+      <Chatbot lastSearch={lastSearch} />
     </BrowserRouter>
   );
 }
