@@ -21,6 +21,7 @@ import EmployerListings from "./pages/employer/Listings";
 import NewListing from "./pages/employer/NewListing";
 import EditListing from "./pages/employer/EditListing";
 import Chatbot from "./components/Chatbot";
+import Reset from "./pages/Reset";
 
 function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
   const location = useLocation();
@@ -36,6 +37,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
       <Route path="/" element={<Welcome token={token} logout={logout} />} />
       <Route path="/login" element={<Login setToken={setToken} setUser={setUser} />} />
       <Route path="/signup" element={<Signup setToken={setToken} setUser={setUser} />} />
+      <Route path="/reset" element={<Reset />} />
       <Route
         path="/home"
         element={<Home onSearch={term => setLastSearch(term)} />}

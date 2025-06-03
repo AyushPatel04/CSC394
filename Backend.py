@@ -17,6 +17,7 @@ import openai
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 import httpx
+from fastapi import Body
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -238,6 +239,35 @@ def login(
         }
     
     raise HTTPException(status_code=401, detail="Invalid credentials")
+
+
+@app.post("/reset/password")
+def reset_password(data: dict, session: Session = Depends(get_session)):
+    username = data.get("username")
+    new_password = data.get("new_password")
+    user = session.exec(select(User).where(User.username == username)).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Username not found")
+
+    user.hashed_password = hash_pw(new_password)
+    session.add(user)
+    session.commit()
+    return {"message": "Password updated successfully"}
+
+@app.post("/reset/username")
+def reset_username(data: dict, session: Session = Depends(get_session)):
+    email = data.get("email")  # or some identifier
+    new_username = data.get("new_username")
+    user = session.exec(select(User).where(User.email == email)).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found with given email")
+
+    user.username = new_username
+    session.add(user)
+    session.commit()
+    return {"message": "Username updated successfully"}
 
 
 # ----- User endpoints -----
