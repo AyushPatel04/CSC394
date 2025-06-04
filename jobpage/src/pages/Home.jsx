@@ -4,7 +4,7 @@ import NavBar     from "../components/NavBar";
 import JbwButton  from "../components/buttons";      
 import JobCard    from "../components/JobCard";
 
-export default function Home({ logout, onSearch }) {   
+export default function Home({ token, logout, onSearch }) {   
   const nav = useNavigate();
 
   const [search, setSearch]  = useState("");
@@ -34,7 +34,7 @@ export default function Home({ logout, onSearch }) {
 
   return (
     <>
-      <NavBar token={true} onLogout={logout} />
+      <NavBar token={token} onLogout={logout} />
 
       <main className="max-w-4xl mx-auto p-6">
         <form

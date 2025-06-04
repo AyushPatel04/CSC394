@@ -40,7 +40,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
       <Route path="/reset" element={<Reset />} />
       <Route
         path="/home"
-        element={<Home onSearch={term => setLastSearch(term)} />}
+        element={<Home token={token} logout={logout} onSearch={term => setLastSearch(term)} />}
       />
       <Route path="/listing/:id" element={<ViewListing />} />
 
