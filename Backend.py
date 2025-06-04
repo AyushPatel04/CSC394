@@ -288,6 +288,24 @@ def read_user(user_id: int, session: Session = Depends(get_session)):
         raise HTTPException(404, "User not found")
     return user
 
+# PUT update a user (NEW)
+@app.put("/users/{user_id}", response_model=User)
+def update_user(user_id: int, updated_user: User, session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(404, "User not found")
+    
+    data = updated_user.dict(exclude_unset=True, exclude={"id"})
+    for key, value in data.items():
+        setattr(user, key, value)
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
+
+'''
+# PUT update a user (OLD)
 @app.put("/users/{user_id}", response_model=User)
 def update_user(
     user_id: int,
@@ -303,6 +321,7 @@ def update_user(
     session.commit()
     session.refresh(user)
     return user
+'''
 
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, session: Session = Depends(get_session)):
@@ -342,6 +361,22 @@ def read_employers(session: Session = Depends(get_session)):
 @app.get("/employers/{employer_id}/listings", response_model=List[JobListing])
 def get_employer_listings(employer_id: int, session: Session = Depends(get_session)):
     return session.exec(select(JobListing).where(JobListing.employer_id == employer_id)).all()
+
+# PUT update an employer
+@app.put("/employer/{employer_id}", response_model=Employer)
+def update_employer(employer_id: int, updated_employer: Employer, session: Session = Depends(get_session)):
+    employer = session.get(Employer, employer_id)
+    if not employer:
+        raise HTTPException(404, "Employer not found")
+    
+    data = update_employer.dict(exclude_unset=True, exclude={"id"})
+    for key, value in data.items():
+        setattr(employer, key, value)
+
+    session.add(employer)
+    session.commit()
+    session.refresh(employer)
+    return employer
 
 @app.delete("/employers/{employer_id}")
 def delete_employer(employer_id: int, session: Session = Depends(get_session)):
