@@ -10,7 +10,7 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from sqlmodel import SQLModel, Field, create_engine, Session, select
+from sqlmodel import SQLModel, Field, create_engine, Session, select, delete
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 import openai
@@ -79,6 +79,12 @@ class User(SQLModel, table=True):
     linkedin_url: Optional[str] = None
     profile_photo_url: Optional[str] = None
     resume: Optional[str] = None
+    phone: Optional[str] = None
+    experience: Optional[str] = None
+    skills: Optional[str] = None
+    education: Optional[str] = None
+    summary: Optional[str] = None
+    other: Optional[str] = None
 
 class Employer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -414,6 +420,9 @@ def delete_listing(listing_id: int, session: Session = Depends(get_session)):
     lst = session.get(JobListing, listing_id)
     if not lst:
         raise HTTPException(404, "Listing not found")
+    
+    session.exec(delete(Application).where(Application.job_listing_id == listing_id))
+
     session.delete(lst); session.commit()
     return {"ok": True}
 
