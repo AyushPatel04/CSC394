@@ -11,10 +11,10 @@ export default function Welcome({ token, setToken, logout }) {
 
       <main className="max-w-4xl mx-auto text-center p-10">
         <h1 className="text-4xl font-extrabold text-primary mb-4">
-          Find your dream remote job.
+          Find your dream job.
         </h1>
         <p className="text-gray-700 mb-8">
-          JobberWobber lets you search thousands of remote tech positions in
+          JobberWobber lets you search thousands of positions in
           seconds — no account required. Sign up to save your favorites and get
           personalized recommendations.
         </p>

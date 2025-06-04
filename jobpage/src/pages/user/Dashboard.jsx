@@ -73,9 +73,26 @@ export default function Dashboard({ logout, showProfileEditor }) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-6xl mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold mb-6">Welcome to your Dashboard</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Welcome to your Dashboard</h1>
+          <div className="space-x-2">
+            <button
+              onClick={() => navigate("/home")}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Home
+            </button>
+            <button
+              onClick={logout}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+
         <p className="mb-8">
-          Track your applications, saved jobs, and account info below.
+          Track your applications and manage account information below.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -88,10 +105,10 @@ export default function Dashboard({ logout, showProfileEditor }) {
                 className="w-24 h-24 rounded-full mx-auto"
               />
               <h2 className="font-bold">{`${user.first_name || ""} ${user.last_name || ""}`}</h2>
-              <p className="text-teal-700">@{user.username}</p>
+              <p className="text-blue-600">@{user.username}</p>
 
               <button
-                className="mt-3 text-sm text-[#14B8A6] underline"
+                className="mt-3 text-sm text-blue-600"
                 onClick={() => navigate("/dashboard/profile")}
               >
                 Edit Profile
@@ -99,14 +116,16 @@ export default function Dashboard({ logout, showProfileEditor }) {
             </div>
 
             <nav className="space-y-2 text-sm mt-6">
+              {/*}
               <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/")}>
                 Home
               </button>
-              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/dashboard/applied")}>
-                Applied Jobs
+              */}
+              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/dashboard/resume")}>
+                Resume
               </button>
-              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/dashboard/saved")}>
-                Saved Jobs
+              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/dashboard/applied")}>
+                Applied Jobs
               </button>
               <button
                 onClick={logout}
@@ -150,6 +169,14 @@ export default function Dashboard({ logout, showProfileEditor }) {
                     disabled={loading}
                   />
                   <input
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder="Phone"
+                    className="border p-2 rounded w-full"
+                    disabled={loading}
+                  />
+                  <input
                     name="location"
                     value={form.location}
                     onChange={handleChange}
@@ -184,7 +211,7 @@ export default function Dashboard({ logout, showProfileEditor }) {
                   <div className="flex gap-2">
                     <button
                       type="submit"
-                      className="bg-[#14B8A6] text-white px-4 py-2 rounded hover:bg-teal-600"
+                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                       disabled={loading}
                     >
                       {loading ? "Saving..." : "Save"}
@@ -202,6 +229,7 @@ export default function Dashboard({ logout, showProfileEditor }) {
               </section>
             ) : (
               <>
+              {/*}
                 <section>
                   <h3 className="text-lg font-semibold mb-2">Your Applications</h3>
                   <p className="text-sm text-gray-600">No applications to display yet.</p>
@@ -210,6 +238,30 @@ export default function Dashboard({ logout, showProfileEditor }) {
                   <h3 className="text-lg font-semibold mb-2">Saved Jobs</h3>
                   <p className="text-sm text-gray-600">You haven't saved any jobs yet.</p>
                 </section>
+                */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Profile</h3>
+                  <div><b>Full Name:</b> {(user.first_name || "") + " " + (user.last_name || "")}</div>
+                  <div><b>Email:</b> {user.email || <span className="text-gray-400">None</span>}</div>
+                  <div><b>Phone:</b> {user.phone || <span className="text-gray-400">None</span>}</div>
+                  <div><b>Location:</b> {user.location || <span className="text-gray-400">None</span>}</div>
+                  <div>
+                    <b>LinkedIn:</b>{" "}
+                    {user.linkedin_url ? (
+                      <a
+                        href={user.linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#14B8A6] underline"
+                      >
+                        {user.linkedin_url}
+                      </a>
+                    ) : (
+                      <span className="text-gray-400">None</span>
+                    )}
+                  </div>
+                  <div><b>About Me:</b> {user.about_me || <span className="text-gray-400">None</span>}</div>
+                </div>
               </>
             )}
           </div>

@@ -109,7 +109,7 @@ export default function Dashboard({ logout }) {
         </div>
 
         <p className="mb-8">
-          Manage your job listings, received applications, and account info below.
+          Manage your job listings, received applications, and account information below.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -117,22 +117,20 @@ export default function Dashboard({ logout }) {
           <div className="bg-white rounded-lg shadow p-4 space-y-4">
             <div className="text-center">
               <h2 className="font-bold">{employer.employer_name}</h2>
-              <p className="text-teal-700">@{employer.username || "yourusername"}</p>
-            </div>
-            <nav className="space-y-2 text-sm">
-              <button className="block w-full text-left hover:text-[#14B8A6]">
-                Dashboard
-              </button>
+              <p className="text-blue-600">@{employer.username || "yourusername"}</p>
               <button
-                className="block w-full text-left hover:text-[#14B8A6]"
+                className="mt-3 text-sm text-blue-600"
                 onClick={handleEdit}
               >
                 Edit Profile
               </button>
-              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/listings")}>
+            </div>
+            
+            <nav className="space-y-2 text-sm">
+              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/listings")}>
                 Posted Job Listings
               </button>
-              <button className="block w-full text-left hover:text-[#14B8A6]">
+              <button className="block w-full text-left hover:text-blue-600">
                 Applications Received
               </button>
               <button
@@ -166,7 +164,7 @@ export default function Dashboard({ logout }) {
                   <div className="flex gap-2">
                     <button
                       type="submit"
-                      className="bg-[#14B8A6] text-white px-4 py-2 rounded hover:bg-teal-600"
+                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                       disabled={loading}
                     >
                       {loading ? "Saving..." : "Save"}

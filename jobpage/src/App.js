@@ -19,7 +19,7 @@ import Reset from "./pages/Reset";
 
 import UserDashboard from "./pages/user/Dashboard";
 import AppliedJobs from "./pages/user/AppliedJobs";
-import SavedJobs from "./pages/user/SavedJobs";
+import UserResume from "./pages/user/UserResume";
 
 import EmployerDashboard from "./pages/employer/Dashboard";
 import EmployerListings from "./pages/employer/Listings";
@@ -61,7 +61,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
         }
       />
       <Route path="/dashboard/applied" element={<AppliedJobs />} />
-      <Route path="/dashboard/saved" element={<SavedJobs />} />
+      <Route path="/dashboard/resume" element={<UserResume />} />
 
       {/* Employer protected routes */}
       <Route
