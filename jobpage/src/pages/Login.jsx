@@ -72,11 +72,13 @@ export default function Login({ setToken, setUser }) {
         <JbwButton className="w-full">Log in</JbwButton>
       </form>
 
+      {/*}
       <p className="mt-4 text-center text-sm">
         <Link to="/reset" className="underline text-primary">
           Forgot username or password?
         </Link>
       </p>
+      */}
 
       <p className="mt-4 text-center text-sm">
         No account?{" "}

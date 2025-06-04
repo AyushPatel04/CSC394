@@ -127,6 +127,9 @@ export default function Dashboard({ logout, showProfileEditor }) {
               <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/dashboard/applied")}>
                 Applied Jobs
               </button>
+              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/reset")}>
+                Reset Password
+              </button>
               <button
                 onClick={logout}
                 className="block w-full text-left text-red-600 hover:underline"

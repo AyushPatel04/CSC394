@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Reset = () => {
-  const [mode, setMode] = useState("username"); // 'username' or 'password'
+  const [mode, setMode] = useState("password"); // 'username' or 'password'
   const [input, setInput] = useState(""); // username or email
   const [newValue, setNewValue] = useState(""); // new password or new username
 
@@ -31,11 +32,13 @@ const Reset = () => {
   };
 
   return (
+    <div>
     <div className="max-w-md mx-auto mt-12 p-6 border border-gray-300 rounded shadow">
       <h2 className="text-2xl font-semibold text-center mb-6">
         Reset {mode === "username" ? "Username" : "Password"}
       </h2>
 
+      {/*}
       <div className="flex justify-center gap-4 mb-6">
         <button
           className={`px-4 py-2 rounded ${
@@ -54,6 +57,7 @@ const Reset = () => {
           Forgot Password
         </button>
       </div>
+      */}
 
       <form onSubmit={handleSubmit} className="space-y-4 text-center">
         {mode && (
@@ -89,6 +93,14 @@ const Reset = () => {
           </>
         )}
       </form>
+    </div>
+
+    <p className="mt-4 text-center text-sm">
+        Back to{" "}
+        <Link to="/dashboard" className="underline text-primary">
+          Dashboard
+        </Link>
+    </p>
     </div>
   );
 };

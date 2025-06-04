@@ -10,9 +10,6 @@ export default function Dashboard({ logout }) {
     username: "",
   });
 
-  //const [listings, setListings] = useState([]);
-  //const [listingsLoading, setListingsLoading] = useState(true);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,25 +24,6 @@ export default function Dashboard({ logout }) {
       setEmployer(null);
     }
   }, []);
-
-  /*
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/listings");
-        const data = await res.json();
-        const userId = JSON.parse(localStorage.getItem("user"))?.id;
-        const userListings = data.listings.filter(job => job.employer_id === userId);
-        setListings(userListings);
-      } catch (err) {
-        console.error("Failed to fetch listings", err);
-      } finally {
-        setListingsLoading(false);
-      }
-    };
-    fetchListings();
-  }, []);
-  */
 
   const handleEdit = () => setEditing(true);
   const handleCancel = () => setEditing(false);
@@ -133,6 +111,9 @@ export default function Dashboard({ logout }) {
               <button className="block w-full text-left hover:text-blue-600">
                 Applications Received
               </button>
+              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/reset")}>
+                Reset Password
+              </button>
               <button
                 onClick={logout}
                 className="block w-full text-left text-red-600 hover:underline"
@@ -181,33 +162,6 @@ export default function Dashboard({ logout }) {
                 </form>
               )}
             </section>
-
-            {/* Job Listings */}
-            {/*
-            <section>
-              <h3 className="text-lg font-semibold mb-2">Your Job Listings</h3>
-              {listingsLoading ? (
-                <p className="text-sm text-gray-500">Loading your listings...</p>
-              ) : listings.length === 0 ? (
-                <p className="text-sm text-gray-500">You haven't posted any jobs yet.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {listings.map((job) => (
-                    <li key={job.id} className="border p-4 rounded shadow">
-                      <h4 className="font-semibold text-lg">{job.title}</h4>
-                      <p className="text-sm text-gray-600">{job.location} • {job.type}</p>
-                      <button
-                        onClick={() => navigate(`/listing/${job.id}`)}
-                        className="mt-2 inline-block bg-blue-600 text-white px-3 py-1 rounded"
-                      >
-                        View Listing
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-            */}
           </div>
         </div>
       </div>

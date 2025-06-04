@@ -363,13 +363,13 @@ def get_employer_listings(employer_id: int, session: Session = Depends(get_sessi
     return session.exec(select(JobListing).where(JobListing.employer_id == employer_id)).all()
 
 # PUT update an employer
-@app.put("/employer/{employer_id}", response_model=Employer)
+@app.put("/employers/{employer_id}", response_model=Employer)
 def update_employer(employer_id: int, updated_employer: Employer, session: Session = Depends(get_session)):
     employer = session.get(Employer, employer_id)
     if not employer:
         raise HTTPException(404, "Employer not found")
     
-    data = update_employer.dict(exclude_unset=True, exclude={"id"})
+    data = updated_employer.dict(exclude_unset=True, exclude={"id"})
     for key, value in data.items():
         setattr(employer, key, value)
 
