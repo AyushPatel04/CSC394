@@ -14,14 +14,14 @@ export default function Welcome({ token, setToken, logout }) {
           Find your dream job.
         </h1>
         <p className="text-gray-700 mb-8">
-          JobberWobber lets you search thousands of positions in
-          seconds — no account required. Sign up to save your favorites and get
+          JobberWobber allows you search job positions in
+          seconds — no account required. Sign up to start applying and get
           personalized recommendations.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <JbwButton onClick={() => navigate("/home")} className="text-lg">
-            Search jobs
+            Search Jobs
           </JbwButton>
 
           {!token && (

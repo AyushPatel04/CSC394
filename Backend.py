@@ -5,12 +5,12 @@ import os
 
 from pydantic import BaseModel
 from fastapi import (
-    FastAPI, Depends, HTTPException, status, Request, Response
+    FastAPI, Depends, HTTPException, status, Request, Response, Query
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from sqlmodel import SQLModel, Field, create_engine, Session, select, delete
+from sqlmodel import SQLModel, Field, create_engine, Session, select, delete, or_, func
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 import openai
@@ -483,7 +483,31 @@ def delete_application(application_id: int, session: Session = Depends(get_sessi
 
 
 
+# ----- DB Search -----
+@app.get("/search")
+def search_listings(q: str = Query(...), session: Session = Depends(get_session)):
+    query_lower = f"%{q.lower()}%"
+    stmt = select(JobListing, Employer.employer_name).join(Employer, JobListing.employer_id == Employer.id).where(
+        or_(
+            func.lower(Employer.employer_name).like(query_lower),
+            func.lower(JobListing.title).like(query_lower),
+            func.lower(JobListing.description).like(query_lower),
+            func.lower(JobListing.type).like(query_lower),
+            func.lower(JobListing.experience).like(query_lower),
+            func.lower(JobListing.location).like(query_lower),
+            func.lower(JobListing.salary).like(query_lower),
+        )
+    )
 
+    query_result = session.exec(stmt).all()
+    listings = []
+    for listing, employer_name in query_result:
+        data = listing.dict()
+        data["company"] = employer_name
+        listings.append(data)
+    return listings
+
+# ----- Remotive -----
 REMOTIVE_PRIMARY  = "https://remotive.com/api/remote-jobs"
 REMOTIVE_FALLBACK = "https://remotive.io/api/remote-jobs"
 

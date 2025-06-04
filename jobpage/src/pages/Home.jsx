@@ -15,7 +15,26 @@ export default function Home({ token, logout, onSearch }) {
   const fetchJobs = q => {
     setLoading(true);
     setError(null);
+    
+    const url = q
+      ? `/search?q=${encodeURIComponent(q)}`
+      : `/jobcard`;
 
+    fetch("http://localhost:8000" + url)
+      .then(r => r.json())
+      .then(d => {
+        const arr = Array.isArray(d) ? d : d.listings ?? [];
+        setJobs(arr);
+      })
+      .catch(() => setError("Server error"))
+      .finally(() => setLoading(false));
+  };
+
+  {/*}
+  const fetchJobs = q => {
+    setLoading(true);
+    setError(null);
+    
     const url = q
       ? `/remote?q=${encodeURIComponent(q)}`
       : `/jobcard`;
@@ -29,6 +48,7 @@ export default function Home({ token, logout, onSearch }) {
       .catch(() => setError("Server error"))
       .finally(() => setLoading(false));
   };
+  */}
 
   useEffect(() => { fetchJobs(""); }, []);
 
