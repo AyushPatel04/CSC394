@@ -11,37 +11,47 @@ export default function NavBar({ token, onLogout }) {
         </Link>
 
         <div className="flex items-center gap-3">
-          <Link
+          <JbwButton
+            as={Link}
             to="/home"
-            className="underline hover:text-gray-200 text-sm font-medium"
+            className="!px-3 !py-1.5 text-sm min-w-[100px] text-center"
           >
-            Search jobs
-          </Link>
+            Search&nbsp;Jobs
+          </JbwButton>
 
           {token ? (
             <>
-              <Link
+              <JbwButton
+                as={Link}
                 to="/dashboard"
-                className="underline hover:text-gray-200 text-sm font-medium"
+                className="!px-3 !py-1.5 text-sm min-w-[100px] text-center"
               >
                 Dashboard
-              </Link>
-              <JbwButton onClick={onLogout}>Log&nbsp;out</JbwButton>
+              </JbwButton>
+              
+              <JbwButton 
+                onClick={onLogout}
+                className="!px-3 !py-1.5 text-sm min-w-[100px] text-center"
+              >
+                Log&nbsp;Out
+              </JbwButton>
             </>
           ) : (
             <>
-              <Link
-                to="/login"
-                className="underline hover:text-gray-200 text-sm font-medium"
-              >
-                Log&nbsp;in
-              </Link>
               <JbwButton
                 as={Link}
                 to="/signup"
-                className="!px-3 !py-1.5 text-sm"
+                className="!px-3 !py-1.5 text-sm min-w-[100px] text-center"
               >
-                Sign&nbsp;up
+                Sign&nbsp;Up
+              </JbwButton>
+
+              <JbwButton
+                as={Link}
+                to="/login"
+                className="!px-3 !py-1.5 text-sm min-w-[100px] text-center"
+              >
+                Log&nbsp;In
               </JbwButton>
             </>
           )}
