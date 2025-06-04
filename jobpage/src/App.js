@@ -1,4 +1,3 @@
-import ViewListing from './components/ViewListing';
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useState, useEffect } from "react";
 import {
@@ -9,19 +8,23 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import Chatbot from "./components/Chatbot";
+
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
+import ViewListing from './pages/ViewListing';
+import Reset from "./pages/Reset";
+
 import UserDashboard from "./pages/user/Dashboard";
+import AppliedJobs from "./pages/user/AppliedJobs";
+import SavedJobs from "./pages/user/SavedJobs";
+
 import EmployerDashboard from "./pages/employer/Dashboard";
-import AppliedJobs from "./components/AppliedJobs.jsx";
-import SavedJobs from "./components/SavedJobs.jsx";
 import EmployerListings from "./pages/employer/Listings";
 import NewListing from "./pages/employer/NewListing";
 import EditListing from "./pages/employer/EditListing";
-import Chatbot from "./components/Chatbot";
-import Reset from "./pages/Reset";
 
 function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
   const location = useLocation();
