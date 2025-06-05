@@ -726,3 +726,27 @@ async def upload_csv(
     session.commit()
     return {"message": f"{count} job listings uploaded successfully"}
 
+@app.get("/employers/{employer_id}/applications")
+def get_received_applications(employer_id: int, session: Session = Depends(get_session)):
+    results = session.exec(
+        select(Application, JobListing, User)
+        .join(JobListing, Application.job_listing_id == JobListing.id)
+        .join(User, Application.user_id == User.id)
+        .where(Application.employer_id == employer_id)
+    ).all()
+
+    applications = []
+    for app, listing, user in results:
+        applications.append({
+            "application_id": app.id,
+            "job_id": listing.id,
+            "job_title": listing.title,
+            "user_id": user.id,
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "user_resume": app.user_resume,
+            "status": app.status
+        })
+
+    return applications
