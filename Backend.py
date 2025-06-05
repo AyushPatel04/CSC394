@@ -248,13 +248,24 @@ def login(
 
 
 @app.post("/reset/password")
-def reset_password(data: dict, session: Session = Depends(get_session)):
-    username = data.get("username")
+def reset_password(
+    data: dict,
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session)
+):
     new_password = data.get("new_password")
-    user = session.exec(select(User).where(User.username == username)).first()
+    if not new_password:
+        raise HTTPException(400, "New password is required")
 
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+    except JWTError:
+        raise HTTPException(401, "Invalid token")
+
+    user = session.exec(select(User).where(User.username == username)).first()
     if not user:
-        raise HTTPException(status_code=404, detail="Username not found")
+        raise HTTPException(404, "User not found")
 
     user.hashed_password = hash_pw(new_password)
     session.add(user)
