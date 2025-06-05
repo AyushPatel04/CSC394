@@ -108,13 +108,13 @@ export default function Dashboard({ logout }) {
                 className="block w-full text-left hover:text-blue-600"
                 onClick={() => navigate("/listings")}
               >
-                Posted Job Listings
+                Job Listings
               </button>
               <button
                 className="block w-full text-left hover:text-blue-600"
                 onClick={() => navigate("/employer/applications")}
               >
-                Applications Received
+                Applications
               </button>
               <button
                 className="block w-full text-left hover:text-blue-600"

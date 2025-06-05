@@ -17,12 +17,12 @@ export default function Application() {
   return (
     <div className="max-w-5xl mx-auto py-10 px-4 text-[#0F172A]">
       <div className="flex justify-between mb-6">
-        <h1 className="text-3xl font-bold">Applications received</h1>
+        <h1 className="text-3xl font-bold">Applications</h1>
         <button
           onClick={() => navigate(-1)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          Back
+          Dashboard
         </button>
       </div>
 
@@ -33,7 +33,7 @@ export default function Application() {
           <thead className="bg-gray-100 text-left">
             <tr>
               <th className="p-3">App&nbsp;ID</th>
-              <th className="p-3">Job title</th>
+              <th className="p-3">Job Title</th>
               <th className="p-3">Status</th>
               <th className="p-3"></th>
             </tr>
