@@ -395,27 +395,7 @@ def get_current_user(
         raise HTTPException(401, "User not found")
     return user
 
-@app.get("/applications/{user_id}")
-def get_applications(user_id: int, session: Session = Depends(get_session)):
-    results = session.exec(
-        select(Application, JobListing)
-        .join(JobListing, Application.job_listing_id == JobListing.id)
-        .where(Application.user_id == user_id)
-    ).all()
 
-    # Return list of job listings the user applied to
-    return [
-        {
-            "id": listing.id,
-            "title": listing.title,
-            "location": listing.location,
-            "type": listing.type,
-            "experience": listing.experience,
-            "salary": listing.salary,
-            "description": listing.description
-        }
-        for _, listing in results
-    ]
 
 # ----- Employer endpoints -----
 @app.post("/employers", response_model=Employer)
@@ -542,6 +522,42 @@ def create_application(application: Application, session: Session = Depends(get_
 @app.get("/applications", response_model=List[Application])
 def read_application(session: Session = Depends(get_session)):
     return session.exec(select(Application)).all()
+
+@app.get("/applications/{user_id}")
+def get_applications(user_id: int, session: Session = Depends(get_session)):
+    results = session.exec(
+        select(Application, JobListing, Employer.employer_name)
+        .join(JobListing, Application.job_listing_id == JobListing.id)
+        .join(Employer, JobListing.employer_id == Employer.id)
+        .where(Application.user_id == user_id)
+    ).all()
+
+    # Return list of job listings the user applied to
+    listings = []
+    for application, listing, employer_name in results:
+        data = listing.dict()
+        data["app_id"] = application.id
+        data["status"] = application.status
+        data["company"] = employer_name
+        listings.append(data)
+
+    return listings
+
+
+    """
+    return [
+        {
+            "id": listing.id,
+            "title": listing.title,
+            "location": listing.location,
+            "type": listing.type,
+            "experience": listing.experience,
+            "salary": listing.salary,
+            "description": listing.description
+        }
+        for _, listing, employer in results
+    ]
+    """
 
 @app.delete("/applications/{application_id}")
 def delete_application(application_id: int, session: Session = Depends(get_session)):

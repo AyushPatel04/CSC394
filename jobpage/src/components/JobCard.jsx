@@ -43,7 +43,7 @@ export default function JobCard({ job }) {
           )}
         </div>
 
-        {job.company && <p className="text-gray-600">{job.company}</p>}
+        {job.company && <p>{job.company}</p>}
         {job.location && <p>{job.location}</p>}
         {job.salary && <p>{job.salary}</p>}
       </div>
