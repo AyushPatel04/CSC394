@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
 const Reset = () => {
   const [mode, setMode] = useState("password");
   const [username, setUsername] = useState(""); // required for verification
