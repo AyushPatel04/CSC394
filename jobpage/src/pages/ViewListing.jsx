@@ -35,6 +35,11 @@ export default function ViewListing() {
       return;
     }
 
+    if (user.role !== "user") {
+      alert("Only users can apply for jobs.");
+      return;
+    }
+
     const application = {
       user_id: user.id,
       employer_id: listing.employer_id,
