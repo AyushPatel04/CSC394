@@ -10,9 +10,6 @@ export default function Dashboard({ logout }) {
     username: "",
   });
 
-  const [applications, setApplications] = useState([]);
-  const [viewingApps, setViewingApps] = useState(false);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,20 +24,6 @@ export default function Dashboard({ logout }) {
       setEmployer(null);
     }
   }, []);
-
-  const fetchApplications = async () => {
-    if (!employer?.id) return;
-    try {
-      const res = await fetch(`http://localhost:8000/employers/${employer.id}/applications`);
-      if (!res.ok) throw new Error("Failed to fetch applications.");
-      const data = await res.json();
-      setApplications(data);
-      setViewingApps(true);
-    } catch (err) {
-      console.error(err);
-      alert("Error loading applications.");
-    }
-  };
 
   const handleEdit = () => setEditing(true);
   const handleCancel = () => setEditing(false);
@@ -121,16 +104,22 @@ export default function Dashboard({ logout }) {
             </div>
 
             <nav className="space-y-2 text-sm">
-              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/listings")}>
+              <button
+                className="block w-full text-left hover:text-blue-600"
+                onClick={() => navigate("/listings")}
+              >
                 Posted Job Listings
               </button>
               <button
                 className="block w-full text-left hover:text-blue-600"
-                onClick={fetchApplications}
+                onClick={() => navigate("/employer/applications")}
               >
                 Applications Received
               </button>
-              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/reset")}>
+              <button
+                className="block w-full text-left hover:text-blue-600"
+                onClick={() => navigate("/reset")}
+              >
                 Reset Password
               </button>
               <button
@@ -179,28 +168,6 @@ export default function Dashboard({ logout }) {
                 </form>
               )}
             </section>
-
-            {viewingApps && (
-              <section>
-                <h3 className="text-lg font-semibold mb-3">Applications Received</h3>
-                {applications.length === 0 ? (
-                  <p>No applications received yet.</p>
-                ) : (
-                  <ul className="space-y-4">
-                    {applications.map((app, index) => (
-                      <li key={index} className="border p-4 rounded">
-                        <p><b>Job Title:</b> {app.title}</p>
-                        <p><b>Applicant:</b>{" "}
-                          {app.first_name || app.last_name
-                            ? `${app.first_name || ""} ${app.last_name || ""}`.trim()
-                            : app.username || "Unknown"}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            )}
           </div>
         </div>
       </div>
