@@ -185,6 +185,12 @@ def signup(
                 "location": user.location,
                 "linkedin_url": user.linkedin_url,
                 "profile_photo_url": user.profile_photo_url,
+                "phone": user.phone,
+                "experience": user.experience,
+                "skills": user.skills,
+                "education": user.education,
+                "summary": user.summary,
+                "other": user.other
             }
         }
     
@@ -219,6 +225,7 @@ def login(
 ):
     user = session.exec(select(User).where(User.username == form.username)).first()
     if user and verify_pw(form.password, user.hashed_password):
+        session.refresh(user)
         token = create_token({"sub": user.username, "role": "user"})
 
         return {
@@ -234,11 +241,18 @@ def login(
                 "location": user.location,
                 "linkedin_url": user.linkedin_url,
                 "profile_photo_url": user.profile_photo_url,
+                "phone": user.phone,
+                "experience": user.experience,
+                "skills": user.skills,
+                "education": user.education,
+                "summary": user.summary,
+                "other": user.other
             }
         }
     
     employer = session.exec(select(Employer).where(Employer.username == form.username)).first()
     if employer and verify_pw(form.password, employer.hashed_password):
+        session.refresh(employer)
         token = create_token({"sub": employer.username, "role": "employer"})
 
         return {
