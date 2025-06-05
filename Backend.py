@@ -691,3 +691,38 @@ async def chat(req: ChatRequest):
         raise HTTPException(500, f"OpenAI error: {e}")
 
     return {"reply": reply}
+
+import csv
+from fastapi import UploadFile, File
+
+@app.post("/upload_csv")
+async def upload_csv(
+    employer_id: int = Body(...),
+    file: UploadFile = File(...),
+    session: Session = Depends(get_session)
+):
+    contents = await file.read()
+    decoded = contents.decode("utf-8").splitlines()
+    reader = csv.DictReader(decoded)
+
+    count = 0
+    for row in reader:
+        try:
+            listing = JobListing(
+                employer_id=employer_id,
+                title=row["title"],
+                location=row["location"],
+                type=row["type"],
+                experience=row["experience"],
+                salary=row["salary"],
+                description=row["description"]
+            )
+            session.add(listing)
+            count += 1
+        except Exception as e:
+            print("Skipping row due to error:", e)
+            continue
+
+    session.commit()
+    return {"message": f"{count} job listings uploaded successfully"}
+
