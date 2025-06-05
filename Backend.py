@@ -629,7 +629,57 @@ def delete_application(application_id: int, session: Session = Depends(get_sessi
     session.delete(application); session.commit()
     return {"ok": True}
 
+@app.get("/application/{app_id}")
+def application_detail(app_id: int, session: Session = Depends(get_session)):
+    rec = session.exec(
+        select(Application, JobListing, User)
+        .join(JobListing, Application.job_listing_id == JobListing.id)
+        .join(User,        Application.user_id       == User.id)
+        .where(Application.id == app_id)
+    ).first()
 
+    if not rec:
+        raise HTTPException(404, "Application not found")
+
+    app, listing, applicant = rec
+    return {
+        "application": app,
+        "listing": {
+            "id":    listing.id,
+            "title": listing.title,
+        },
+        "applicant": {
+            "first_name": applicant.first_name,
+            "last_name":  applicant.last_name,
+            "email":      applicant.email,
+            "phone":      applicant.phone,
+            "location":   applicant.location,
+            "linkedin":   applicant.linkedin_url,
+            "experience": applicant.experience,
+            "skills":     applicant.skills,
+            "education":  applicant.education,
+            "summary":    applicant.summary,
+            "other":      applicant.other,
+        }
+    }
+
+
+
+@app.put("/application/{app_id}/status")
+def update_application_status(
+    app_id: int,
+    status: str = Body(..., embed=True),
+    session: Session = Depends(get_session)
+):
+    app = session.get(Application, app_id)
+    if not app:
+        raise HTTPException(404, "Application not found")
+
+    app.status = status
+    session.add(app)
+    session.commit()
+    session.refresh(app)
+    return {"message": "Status updated", "application": app}
 
 # ----- DB Search -----
 @app.get("/search")
