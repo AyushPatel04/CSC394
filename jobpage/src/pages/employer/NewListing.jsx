@@ -1,117 +1,154 @@
-import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function NewListing() {
-    const [submitting, setSubmitting] = useState(false);
-    const navigate = useNavigate();
-    const [form, setForm] = useState({
-        title: "",
-        location: "",
-        type: "",
-        experience: "",
-        salary: "",
-        description: ""
-    });
+  const navigate = useNavigate();
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
+  const [type, setType] = useState("Full-time");
+  const [experience, setExperience] = useState("");
+  const [salary, setSalary] = useState("");
+  const [description, setDescription] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-    const handleChange = e => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const employer = JSON.parse(localStorage.getItem("user"));
+
+    const payload = {
+      title,
+      location,
+      type,
+      experience,
+      salary,
+      description,
+      employer_id: employer.id,
     };
 
-    const handleSubmit = async e => {
-        e.preventDefault();
-        const employer = JSON.parse(localStorage.getItem("user"));
-        if (!employer?.id) return alert("Employer ID not found.");
-    
-        setSubmitting(true);
-        try {
-            const res = await fetch("http://localhost:8000/listings", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...form, employer_id: employer.id }),
-            });
-            if (!res.ok) throw new Error("Failed to post job listing");
-            await res.json();
-            navigate("/listings");
-        } catch (err) {
-            alert("Error posting job listing.");
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    try {
+      setSubmitting(true);
+      const res = await fetch("http://localhost:8000/listings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    return (
-        <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
-            <h3 className="text-lg font-semibold mb-2">New Job Listing</h3>
-            <form onSubmit={handleSubmit} className="space-y-2">
-                <input
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    placeholder="Job Title"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <input
-                    name="location"
-                    value={form.location}
-                    onChange={handleChange}
-                    placeholder="Location"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <input
-                    name="type"
-                    value={form.type}
-                    onChange={handleChange}
-                    placeholder="Job Type"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <input
-                    name="experience"
-                    value={form.experience}
-                    onChange={handleChange}
-                    placeholder="Experience Required"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <input
-                    name="salary"
-                    value={form.salary}
-                    onChange={handleChange}
-                    placeholder="Salary"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <textarea
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    placeholder="Job Description"
-                    className="border p-2 rounded w-full"
-                    rows={20}
-                    required
-                />
-                <div className="flex gap-2">
-                    <button
-                        type="button"
-                        onClick={() => navigate("/listings")}
-                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                        disabled={submitting}
-                    >
-                        Cancel
-                    </button>
+      if (!res.ok) {
+        throw new Error("Error creating job listing");
+      }
 
-                    <button
-                        type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                        disabled={submitting}
-                    >
-                        {submitting ? "Posting..." : "Post Job Listing"}
-                    </button>
-                </div>
-            </form>
+      alert("Job listing posted!");
+      navigate("/listings");
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
+      <h3 className="text-lg font-semibold mb-2">New Job Listing</h3>
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <input
+          type="text"
+          placeholder="Job title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          required
+          className="w-full p-2 border rounded"
+        />
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="w-full p-2 border rounded"
+        >
+          <option>Full-time</option>
+          <option>Part-time</option>
+          <option>Internship</option>
+          <option>Contract</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Experience required"
+          value={experience}
+          onChange={(e) => setExperience(e.target.value)}
+          required
+          className="w-full p-2 border rounded"
+        />
+        <input
+          type="text"
+          placeholder="Salary"
+          value={salary}
+          onChange={(e) => setSalary(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+        <textarea
+          placeholder="Job description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          className="w-full p-2 border rounded"
+        />
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => navigate("/listings")}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            disabled={submitting}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            disabled={submitting}
+          >
+            {submitting ? "Posting..." : "Post Job Listing"}
+          </button>
         </div>
-    );
+      </form>
+
+      <hr className="my-4" />
+
+      <h4 className="font-semibold">Upload Job Listings via CSV</h4>
+      <input
+        type="file"
+        accept=".csv"
+        onChange={async (e) => {
+          const employer = JSON.parse(localStorage.getItem("user"));
+          if (!employer?.id) return alert("Employer ID not found");
+
+          const file = e.target.files[0];
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("employer_id", employer.id);
+
+          try {
+            const res = await fetch("http://localhost:8000/upload_csv", {
+              method: "POST",
+              body: formData,
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.detail || "CSV upload failed");
+            alert("Uploaded successfully!");
+            navigate("/listings");
+          } catch (err) {
+            alert("Error uploading CSV: " + err.message);
+          }
+        }}
+        className="mt-2"
+      />
+    </div>
+  );
 }
