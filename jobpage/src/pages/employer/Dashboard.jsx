@@ -10,6 +10,9 @@ export default function Dashboard({ logout }) {
     username: "",
   });
 
+  const [applications, setApplications] = useState([]);
+  const [viewingApps, setViewingApps] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +27,20 @@ export default function Dashboard({ logout }) {
       setEmployer(null);
     }
   }, []);
+
+  const fetchApplications = async () => {
+    if (!employer?.id) return;
+    try {
+      const res = await fetch(`http://localhost:8000/employers/${employer.id}/applications`);
+      if (!res.ok) throw new Error("Failed to fetch applications.");
+      const data = await res.json();
+      setApplications(data);
+      setViewingApps(true);
+    } catch (err) {
+      console.error(err);
+      alert("Error loading applications.");
+    }
+  };
 
   const handleEdit = () => setEditing(true);
   const handleCancel = () => setEditing(false);
@@ -91,7 +108,6 @@ export default function Dashboard({ logout }) {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Sidebar */}
           <div className="bg-white rounded-lg shadow p-4 space-y-4">
             <div className="text-center">
               <h2 className="font-bold">{employer.employer_name}</h2>
@@ -103,12 +119,15 @@ export default function Dashboard({ logout }) {
                 Edit Profile
               </button>
             </div>
-            
+
             <nav className="space-y-2 text-sm">
               <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/listings")}>
                 Posted Job Listings
               </button>
-              <button className="block w-full text-left hover:text-blue-600">
+              <button
+                className="block w-full text-left hover:text-blue-600"
+                onClick={fetchApplications}
+              >
                 Applications Received
               </button>
               <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/reset")}>
@@ -123,9 +142,7 @@ export default function Dashboard({ logout }) {
             </nav>
           </div>
 
-          {/* Main Content */}
           <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
-            {/* Profile Section */}
             <section>
               <h3 className="text-lg font-semibold mb-2">Profile</h3>
               {!editing ? (
@@ -162,6 +179,28 @@ export default function Dashboard({ logout }) {
                 </form>
               )}
             </section>
+
+            {viewingApps && (
+              <section>
+                <h3 className="text-lg font-semibold mb-3">Applications Received</h3>
+                {applications.length === 0 ? (
+                  <p>No applications received yet.</p>
+                ) : (
+                  <ul className="space-y-4">
+                    {applications.map((app, index) => (
+                      <li key={index} className="border p-4 rounded">
+                        <p><b>Job Title:</b> {app.job_title}</p>
+                        <p><b>Applicant:</b>{" "}
+                          {app.first_name || app.last_name
+                            ? `${app.first_name || ""} ${app.last_name || ""}`.trim()
+                            : app.username || "Unknown"}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
           </div>
         </div>
       </div>
