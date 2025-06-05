@@ -23,14 +23,23 @@ export default function Login({ setToken, setUser }) {
       body,
     })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => {
+      .then(async (data) => {
         // Confirm structure before storing
-        if (!data.access_token || !data.user) throw new Error("Malformed response");
+        if (!data.access_token || !data.user || !data.user.id) throw new Error("Malformed response");
 
         localStorage.setItem("token", data.access_token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+
+        const userResponse = await fetch(`http://localhost:8000/users/${data.user.id}`, {
+          headers: {"Content-Type": "application/json"}
+        });
+
+        if (!userResponse.ok) throw new Error("Failed to fetch user");
+
+        const refreshedUser = await userResponse.json();
+
+        localStorage.setItem("user", JSON.stringify(refreshedUser));
         setToken(data.access_token);
-        setUser(data.user);
+        setUser(refreshedUser);
 
         //nav("/dashboard");
         if (data.user.role === "employer") {
@@ -39,7 +48,7 @@ export default function Login({ setToken, setUser }) {
           nav("/user/dashboard");
         } else {            
           nav("/");
-  }
+        }
       })
       .catch((e) => {
         console.error("Login error:", e);
