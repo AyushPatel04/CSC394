@@ -189,7 +189,7 @@ export default function Dashboard({ logout }) {
                   <ul className="space-y-4">
                     {applications.map((app, index) => (
                       <li key={index} className="border p-4 rounded">
-                        <p><b>Job Title:</b> {app.job_title}</p>
+                        <p><b>Job Title:</b> {app.title}</p>
                         <p><b>Applicant:</b>{" "}
                           {app.first_name || app.last_name
                             ? `${app.first_name || ""} ${app.last_name || ""}`.trim()

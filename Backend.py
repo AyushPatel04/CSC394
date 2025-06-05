@@ -310,7 +310,17 @@ def apply_to_job(
     user_id: int = Body(...),
     employer_id: int = Body(...),
     job_listing_id: int = Body(...),
-    user_resume: str = Body(...),
+    first_name: Optional[str] = Body(None),
+    last_name: Optional[str] = Body(None),
+    email: Optional[str] = Body(None),
+    phone: Optional[str] = Body(None),
+    location: Optional[str] = Body(None),
+    linkedin_url: Optional[str] = Body(None),
+    experience: Optional[str] = Body(None),
+    skills: Optional[str] = Body(None),
+    education: Optional[str] = Body(None),
+    summary: Optional[str] = Body(None),
+    other: Optional[str] = Body(None),
     session: Session = Depends(get_session)
 ):
     # Check if the application already exists
@@ -328,7 +338,17 @@ def apply_to_job(
         user_id=user_id,
         employer_id=employer_id,
         job_listing_id=job_listing_id,
-        user_resume=user_resume
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        phone=phone,
+        location=location,
+        linkedin_url=linkedin_url,
+        experience=experience,
+        skills=skills,
+        education=education,
+        summary=summary,
+        other=other
     )
     session.add(application)
     session.commit()
