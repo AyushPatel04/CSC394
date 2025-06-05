@@ -248,13 +248,24 @@ def login(
 
 
 @app.post("/reset/password")
-def reset_password(data: dict, session: Session = Depends(get_session)):
-    username = data.get("username")
+def reset_password(
+    data: dict,
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session)
+):
     new_password = data.get("new_password")
-    user = session.exec(select(User).where(User.username == username)).first()
+    if not new_password:
+        raise HTTPException(400, "New password is required")
 
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+    except JWTError:
+        raise HTTPException(401, "Invalid token")
+
+    user = session.exec(select(User).where(User.username == username)).first()
     if not user:
-        raise HTTPException(status_code=404, detail="Username not found")
+        raise HTTPException(404, "User not found")
 
     user.hashed_password = hash_pw(new_password)
     session.add(user)
@@ -275,24 +286,6 @@ def reset_username(data: dict, session: Session = Depends(get_session)):
     session.commit()
     return {"message": "Username updated successfully"}
 
-@app.post("/apply")
-def apply_to_job(
-    user_id: int = Body(...),
-    employer_id: int = Body(...),
-    job_listing_id: int = Body(...),
-    user_resume: str = Body(...),
-    session: Session = Depends(get_session)
-):
-    application = Application(
-        user_id=user_id,
-        employer_id=employer_id,
-        job_listing_id=job_listing_id,
-        user_resume=user_resume
-    )
-    session.add(application)
-    session.commit()
-    session.refresh(application)
-    return {"message": "Application submitted", "application": application}
 
 # ----- User endpoints -----
 @app.get("/users", response_model=List[User])
