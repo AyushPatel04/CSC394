@@ -15,11 +15,9 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 import openai
 from openai import AsyncOpenAI
-from dotenv import load_dotenv
 import httpx
 from fastapi import Body
 
-load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 # ----- Auth config -----
 SECRET_KEY = os.getenv("JWT_SECRET", "dev-secret-change-me")
@@ -568,18 +566,38 @@ def search_listings(q: str = Query(...), session: Session = Depends(get_session)
     return listings
 
 # ----- Remotive -----
-REMOTIVE_PRIMARY  = "https://remotive.com/api/remote-jobs"
-REMOTIVE_FALLBACK = "https://remotive.io/api/remote-jobs"
+ADZUNA_APP_ID = "b93f0af2"
+ADZUNA_APP_KEY = "ac2968e9aa37b2d474d60277da360974"
 
-async def _query_remotive(params: dict):
-    async with httpx.AsyncClient(timeout=10) as client:
-        try:
-            r = await client.get(REMOTIVE_PRIMARY, params=params)
-            r.raise_for_status()
-        except httpx.HTTPStatusError:
-            r = await client.get(REMOTIVE_FALLBACK, params=params)
-            r.raise_for_status()
-    return r.json().get("jobs", [])
+@app.get("/adzuna")
+async def get_adzuna_jobs(q: str):
+    import httpx
+    url = "https://api.adzuna.com/v1/api/jobs/us/search/1"
+    params = {
+        "app_id": ADZUNA_APP_ID,
+        "app_key": ADZUNA_APP_KEY,
+        "results_per_page": 10,
+        "what": q,
+        "content-type": "application/json"
+    }
+
+    async with httpx.AsyncClient() as client:
+        res = await client.get(url, params=params)
+        res.raise_for_status()
+        data = res.json()
+        return [
+            {
+                "id": f"adzuna_{j['id']}",
+                "title": j["title"],
+                "company": j["company"]["display_name"],
+                "location": j["location"]["display_name"],
+                "salary": j.get("salary_is_predicted") == "1" and "$" or j.get("salary_min"),
+                "url": j["redirect_url"],
+                "publication_date": j["created"]
+            }
+            for j in data["results"]
+        ]
+
 
 @app.get("/remote")
 async def remote_search(q: str, limit: int = 10):
