@@ -4,7 +4,7 @@ import NavBar     from "../components/NavBar";
 import JbwButton  from "../components/buttons";      
 import JobCard    from "../components/JobCard";
 
-export default function Home({ token, logout, onSearch }) {   
+export default function Home({ token, logout, onSearch }) {
   const nav = useNavigate();
 
   const [search, setSearch]  = useState("");
@@ -12,43 +12,30 @@ export default function Home({ token, logout, onSearch }) {
   const [loading, setLoading]= useState(false);
   const [error,   setError]  = useState(null);
 
-  const fetchJobs = q => {
+  const fetchJobs = async (q) => {
     setLoading(true);
     setError(null);
-    
-    const url = q
-      ? `/search?q=${encodeURIComponent(q)}`
-      : `/jobcard`;
 
-    fetch("http://localhost:8000" + url)
-      .then(r => r.json())
-      .then(d => {
-        const arr = Array.isArray(d) ? d : d.listings ?? [];
-        setJobs(arr);
-      })
-      .catch(() => setError("Server error"))
-      .finally(() => setLoading(false));
+    try {
+      const localUrl = q ? `/search?q=${encodeURIComponent(q)}` : `/jobcard`;
+      const adzunaUrl = `/adzuna?q=${encodeURIComponent(q || "software")}`;
+
+      const [localRes, adzunaRes] = await Promise.all([
+        fetch("http://localhost:8000" + localUrl).then(r => r.json()),
+        fetch("http://localhost:8000" + adzunaUrl).then(r => r.json())
+      ]);
+
+      const localJobs = Array.isArray(localRes) ? localRes : localRes.listings ?? [];
+      const adzunaJobs = Array.isArray(adzunaRes) ? adzunaRes : [];
+
+      setJobs([...localJobs, ...adzunaJobs]);
+    } catch (err) {
+      console.error(err);
+      setError("Server error");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  {/*}
-  const fetchJobs = q => {
-    setLoading(true);
-    setError(null);
-    
-    const url = q
-      ? `/remote?q=${encodeURIComponent(q)}`
-      : `/jobcard`;
-
-    fetch("http://localhost:8000" + url)
-      .then(r => r.json())
-      .then(d => {
-        const arr = Array.isArray(d) ? d : d.listings ?? [];
-        setJobs(arr);
-      })
-      .catch(() => setError("Server error"))
-      .finally(() => setLoading(false));
-  };
-  */}
 
   useEffect(() => { fetchJobs(""); }, []);
 
@@ -61,7 +48,7 @@ export default function Home({ token, logout, onSearch }) {
           onSubmit={e => {
             e.preventDefault();
             const q = search.trim();
-            onSearch?.(q);          
+            onSearch?.(q);
             fetchJobs(q);
           }}
           className="flex gap-2 mb-8"
