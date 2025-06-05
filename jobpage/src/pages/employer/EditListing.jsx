@@ -66,77 +66,81 @@ export default function EditListing() {
     if (loading) return <div>Loading your job listing...</div>;
 
     return (
-        <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
-            <h3 className="text-lg font-semibold mb-2">Edit Job Listing</h3>
-            <form onSubmit={handleSubmit} className="space-y-2">
-                <input
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    placeholder="Job Title"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <input
-                    name="location"
-                    value={form.location}
-                    onChange={handleChange}
-                    placeholder="Location"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <input
-                    name="type"
-                    value={form.type}
-                    onChange={handleChange}
-                    placeholder="Job Type"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <input
-                    name="experience"
-                    value={form.experience}
-                    onChange={handleChange}
-                    placeholder="Experience Required"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <input
-                    name="salary"
-                    value={form.salary}
-                    onChange={handleChange}
-                    placeholder="Salary"
-                    className="border p-2 rounded w-full"
-                    required
-                />
-                <textarea
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    placeholder="Job Description"
-                    className="border p-2 rounded w-full"
-                    rows={20}
-                    required
-                />
-                <div className="flex gap-2">
-                    <button
-                        type="button"
-                        onClick={() => navigate("/listings")}
-                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                        disabled={submitting}
-                    >
-                        Cancel
-                    </button>
+        <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
+            <div className="max-w-4xl mx-auto py-10 px-4">
+                <h1 className="text-3xl font-bold">Edit Job Listing</h1><br></br>
+                <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-2">
+                        <input
+                            name="title"
+                            value={form.title}
+                            onChange={handleChange}
+                            placeholder="Job Title"
+                            className="border p-2 rounded w-full"
+                            required
+                        />
+                        <input
+                            name="location"
+                            value={form.location}
+                            onChange={handleChange}
+                            placeholder="Location"
+                            className="border p-2 rounded w-full"
+                            required
+                        />
+                        <input
+                            name="type"
+                            value={form.type}
+                            onChange={handleChange}
+                            placeholder="Job Type"
+                            className="border p-2 rounded w-full"
+                            required
+                        />
+                        <input
+                            name="experience"
+                            value={form.experience}
+                            onChange={handleChange}
+                            placeholder="Experience Required"
+                            className="border p-2 rounded w-full"
+                            required
+                        />
+                        <input
+                            name="salary"
+                            value={form.salary}
+                            onChange={handleChange}
+                            placeholder="Salary"
+                            className="border p-2 rounded w-full"
+                            required
+                        />
+                        <textarea
+                            name="description"
+                            value={form.description}
+                            onChange={handleChange}
+                            placeholder="Job Description"
+                            className="border p-2 rounded w-full"
+                            rows={20}
+                            required
+                        />
+                        <div className="flex gap-2">
+                            <button
+                                type="submit"
+                                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                disabled={submitting}
+                            >
+                                {submitting ? "Saving..." : "Save"}
+                            </button>
 
-                    <button
-                        type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                        disabled={submitting}
-                    >
-                        {submitting ? "Updating..." : "Update Job Listing"}
-                    </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate("/listings")}
+                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+                                disabled={submitting}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     );
 }

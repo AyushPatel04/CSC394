@@ -49,106 +49,110 @@ export default function NewListing() {
   };
 
   return (
-    <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
-      <h3 className="text-lg font-semibold mb-2">New Job Listing</h3>
-      <form onSubmit={handleSubmit} className="space-y-2">
-        <input
-          type="text"
-          placeholder="Job title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          placeholder="Location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          className="w-full p-2 border rounded"
-        >
-          <option>Full-time</option>
-          <option>Part-time</option>
-          <option>Internship</option>
-          <option>Contract</option>
-        </select>
-        <input
-          type="text"
-          placeholder="Experience required"
-          value={experience}
-          onChange={(e) => setExperience(e.target.value)}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          placeholder="Salary"
-          value={salary}
-          onChange={(e) => setSalary(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <textarea
-          placeholder="Job description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-          className="w-full p-2 border rounded"
-        />
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => navigate("/listings")}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            disabled={submitting}
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
+      <div className="max-w-4xl mx-auto py-10 px-4">
+        <h1 className="text-3xl font-bold">New Job Listing</h1><br></br>
+        <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-2">
+          <input
+            type="text"
+            placeholder="Job title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            placeholder="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+            className="w-full p-2 border rounded"
+          />
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="w-full p-2 border rounded"
           >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            disabled={submitting}
-          >
-            {submitting ? "Posting..." : "Post Job Listing"}
-          </button>
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Internship</option>
+            <option>Contract</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Experience required"
+            value={experience}
+            onChange={(e) => setExperience(e.target.value)}
+            required
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            placeholder="Salary"
+            value={salary}
+            onChange={(e) => setSalary(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+          <textarea
+            placeholder="Job description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            className="w-full p-2 border rounded"
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => navigate("/listings")}
+              className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+              disabled={submitting}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              disabled={submitting}
+            >
+              {submitting ? "Posting..." : "Post Job Listing"}
+            </button>
+          </div>
+        </form>
+
+        <hr className="my-4" />
+
+        <h4 className="font-semibold">Upload Job Listings via CSV</h4>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={async (e) => {
+            const employer = JSON.parse(localStorage.getItem("user"));
+            if (!employer?.id) return alert("Employer ID not found");
+
+            const file = e.target.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("employer_id", employer.id);
+
+            try {
+              const res = await fetch("http://localhost:8000/upload_csv", {
+                method: "POST",
+                body: formData,
+              });
+              const result = await res.json();
+              if (!res.ok) throw new Error(result.detail || "CSV upload failed");
+              alert("Uploaded successfully!");
+              navigate("/listings");
+            } catch (err) {
+              alert("Error uploading CSV: " + err.message);
+            }
+          }}
+          className="mt-2"
+        />
         </div>
-      </form>
-
-      <hr className="my-4" />
-
-      <h4 className="font-semibold">Upload Job Listings via CSV</h4>
-      <input
-        type="file"
-        accept=".csv"
-        onChange={async (e) => {
-          const employer = JSON.parse(localStorage.getItem("user"));
-          if (!employer?.id) return alert("Employer ID not found");
-
-          const file = e.target.files[0];
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("employer_id", employer.id);
-
-          try {
-            const res = await fetch("http://localhost:8000/upload_csv", {
-              method: "POST",
-              body: formData,
-            });
-            const result = await res.json();
-            if (!res.ok) throw new Error(result.detail || "CSV upload failed");
-            alert("Uploaded successfully!");
-            navigate("/listings");
-          } catch (err) {
-            alert("Error uploading CSV: " + err.message);
-          }
-        }}
-        className="mt-2"
-      />
+      </div>
     </div>
   );
 }

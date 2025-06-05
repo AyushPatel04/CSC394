@@ -92,34 +92,60 @@ export default function ViewListing() {
     );
   }
 
-  return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow rounded text-[#0F172A]">
-      <h2 className="text-2xl font-bold mb-4">{listing.title}</h2>
-      <div className="space-y-2">
-        <p><strong>Company:</strong> {listing.company}</p>
-        <p><strong>Location:</strong> {listing.location}</p>
-        <p><strong>Type:</strong> {listing.type}</p>
-        <p><strong>Experience:</strong> {listing.experience}</p>
-        <p><strong>Salary:</strong> {listing.salary}</p>
-        <p><strong>Description:</strong> {listing.description}</p>
+  const FormatTextField = ({ category, text }) => {
+    if (!text) {
+      return (
+        <div>
+          <h2><strong>{category}:</strong></h2>
+          <p className="text-gray-400">None</p>
+          <br></br>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <h2><strong>{category}:</strong></h2>
+        {text.split("\n").map((line, index) => (
+          <div key={index}>{line}</div>
+        ))}
+        <br></br>
       </div>
+    );
+  };
 
-      <div className="mt-6 flex gap-4">
-        <button
-          type="button"
-          onClick={handleApply}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          Apply
-        </button>
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
+      <div className="max-w-3xl mx-auto py-10 px-4">
+        <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
+          <h2 className="text-2xl font-bold mb-4">{listing.title}</h2>
+          <div className="space-y-2">
+            <p><strong>Company:</strong> {listing.company}</p>
+            <p><strong>Location:</strong> {listing.location}</p>
+            <p><strong>Type:</strong> {listing.type}</p>
+            <p><strong>Experience:</strong> {listing.experience}</p>
+            <p><strong>Salary:</strong> {listing.salary}</p>
+            <FormatTextField category="Description" text={listing.description}/>
+          </div>
 
-        <button
-          type="button"
-          onClick={() => navigate(`/home`)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Back to Listings
-        </button>
+          <div className="mt-6 flex gap-4">
+            <button
+              type="button"
+              onClick={handleApply}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              Apply
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate(`/home`)}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Back to Listings
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

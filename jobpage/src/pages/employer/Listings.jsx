@@ -46,17 +46,17 @@ export default function Listings() {
                     <h1 className="text-3xl font-bold">Posted Job Listings</h1>
                     <div className="space-x-2">
                         <button
-                                type="button"
-                                onClick={() => navigate("/newlisting")}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                            >
-                                New Job Listing
-                            </button>
-                        <button
-                        onClick={() => navigate("/dashboard")}
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            type="button"
+                            onClick={() => navigate("/newlisting")}
+                            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
                         >
-                        Dashboard
+                            New Job Listing
+                        </button>
+                        <button
+                            onClick={() => navigate("/dashboard")}
+                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                            Dashboard
                         </button>
                     </div>
                 </div>

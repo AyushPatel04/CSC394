@@ -55,7 +55,7 @@ export default function ApplicationDetail() {
     <div className="max-w-3xl mx-auto py-10 px-4">
       <button
         onClick={() => navigate(-1)}
-        className="mb-6 bg-blue-600 text-white px-4 py-1 rounded"
+        className="mb-6 bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
       >
         ← Back
       </button>

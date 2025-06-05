@@ -74,7 +74,7 @@ export default function Dashboard({ logout, showProfileEditor }) {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-6xl mx-auto py-10 px-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Welcome to your Dashboard</h1>
+          <h1 className="text-3xl font-bold">Welcome to Your Dashboard</h1>
           <div className="space-x-2">
             <button
               onClick={() => navigate("/home")}
