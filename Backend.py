@@ -275,6 +275,24 @@ def reset_username(data: dict, session: Session = Depends(get_session)):
     session.commit()
     return {"message": "Username updated successfully"}
 
+@app.post("/apply")
+def apply_to_job(
+    user_id: int = Body(...),
+    employer_id: int = Body(...),
+    job_listing_id: int = Body(...),
+    user_resume: str = Body(...),
+    session: Session = Depends(get_session)
+):
+    application = Application(
+        user_id=user_id,
+        employer_id=employer_id,
+        job_listing_id=job_listing_id,
+        user_resume=user_resume
+    )
+    session.add(application)
+    session.commit()
+    session.refresh(application)
+    return {"message": "Application submitted", "application": application}
 
 # ----- User endpoints -----
 @app.get("/users", response_model=List[User])

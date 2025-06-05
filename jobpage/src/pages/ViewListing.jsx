@@ -9,22 +9,59 @@ export default function ViewListing() {
 
   useEffect(() => {
     fetch("http://localhost:8000/jobcard")
-      .then(res => res.json())
-      .then(data => {
-        const match = data.find(l => l.id.toString() === id);
+      .then((res) => res.json())
+      .then((data) => {
+        const match = data.find((l) => l.id.toString() === id);
         if (!match) {
           alert("Job listing not found");
-          navigate("/listings");
+          navigate("/home");
           return;
         }
         setListing(match);
       })
       .catch(() => {
         alert("Error fetching job listing");
-        navigate("/listings");
+        navigate("/home");
       })
       .finally(() => setLoading(false));
   }, [id, navigate]);
+
+  const handleApply = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+
+    if (!user || !token) {
+      alert("Please log in to apply for this job.");
+      return;
+    }
+
+    const application = {
+      user_id: user.id,
+      employer_id: listing.employer_id, // Ensure this field is returned in your jobcard data
+      job_listing_id: listing.id,
+      user_resume: user.resume || "No resume provided"
+    };
+
+    fetch("http://localhost:8000/apply", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(application)
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to apply.");
+        return res.json();
+      })
+      .then(() => {
+        alert("Application submitted successfully!");
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Error submitting application.");
+      });
+  };
 
   if (loading) {
     return (
@@ -34,7 +71,7 @@ export default function ViewListing() {
     );
   }
 
-    if (!listing) {
+  if (!listing) {
     return (
       <div className="flex h-screen justify-center items-center">
         <div className="text-gray-400 text-xl">Job listing not found.</div>
@@ -52,15 +89,26 @@ export default function ViewListing() {
         <p><strong>Experience:</strong> {listing.experience}</p>
         <p><strong>Salary:</strong> {listing.salary}</p>
         <p><strong>Description:</strong> {listing.description}</p>
+      </div>
 
-      <button
-        type="button"
-        onClick={() => navigate(`/home`)}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Back to Listings
-      </button>
+      <div className="mt-6 flex gap-4">
+        <button
+          type="button"
+          onClick={handleApply}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Apply
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate(`/home`)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Back to Listings
+        </button>
       </div>
     </div>
   );
 }
+
