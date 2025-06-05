@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import JobCard    from "../../components/JobCard";
 
 export default function AppliedJobs() {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ export default function AppliedJobs() {
         </div>
 
         <p className="mb-8">
-          Track your applications below.
+          View and track your submitted applications below.
         </p>
 
         {loading ? (

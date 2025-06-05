@@ -76,7 +76,6 @@ class User(SQLModel, table=True):
     location: Optional[str] = None
     linkedin_url: Optional[str] = None
     profile_photo_url: Optional[str] = None
-    resume: Optional[str] = None
     phone: Optional[str] = None
     experience: Optional[str] = None
     skills: Optional[str] = None
@@ -105,8 +104,18 @@ class Application(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id")
     employer_id: int = Field(foreign_key="employer.id")
     job_listing_id: int = Field(foreign_key="joblisting.id")
-    user_resume: str
     status: Optional[str] = Field(default="Submitted")
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    location: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    experience: Optional[str] = None
+    skills: Optional[str] = None
+    education: Optional[str] = None
+    summary: Optional[str] = None
+    other: Optional[str] = None
 
 # Pydantic models for API
 class Credentials(BaseModel):
@@ -411,6 +420,25 @@ def read_employers(session: Session = Depends(get_session)):
 @app.get("/employers/{employer_id}/listings", response_model=List[JobListing])
 def get_employer_listings(employer_id: int, session: Session = Depends(get_session)):
     return session.exec(select(JobListing).where(JobListing.employer_id == employer_id)).all()
+
+# GET all applications submitted to an employer
+@app.get("/employers/{employer_id}/applications")
+def get_received_applications(employer_id: int, session: Session = Depends(get_session)):
+    results = session.exec(
+        select(Application, JobListing, User)
+        .join(JobListing, Application.job_listing_id == JobListing.id)
+        .join(User, Application.user_id == User.id)
+        .where(Application.employer_id == employer_id)
+    ).all()
+
+    applications = []
+    for app, listing, user in results:
+        data = app.dict()
+        data["title"] = listing.title
+        applications.append(data)
+    
+    return applications
+
 
 # PUT update an employer
 @app.put("/employers/{employer_id}", response_model=Employer)
@@ -772,27 +800,3 @@ async def upload_csv(
     session.commit()
     return {"message": f"{count} job listings uploaded successfully"}
 
-@app.get("/employers/{employer_id}/applications")
-def get_received_applications(employer_id: int, session: Session = Depends(get_session)):
-    results = session.exec(
-        select(Application, JobListing, User)
-        .join(JobListing, Application.job_listing_id == JobListing.id)
-        .join(User, Application.user_id == User.id)
-        .where(Application.employer_id == employer_id)
-    ).all()
-
-    applications = []
-    for app, listing, user in results:
-        applications.append({
-            "application_id": app.id,
-            "job_id": listing.id,
-            "job_title": listing.title,
-            "user_id": user.id,
-            "username": user.username,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "user_resume": app.user_resume,
-            "status": app.status
-        })
-
-    return applications

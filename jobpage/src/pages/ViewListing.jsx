@@ -39,7 +39,17 @@ export default function ViewListing() {
       user_id: user.id,
       employer_id: listing.employer_id,
       job_listing_id: listing.id,
-      user_resume: user.resume || "No resume provided",
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      phone: user.phone,
+      location: user.location,
+      linkedin_url: user.linkedin_url,
+      experience: user.experience,
+      skills: user.skills,
+      education: user.education,
+      summary: user.summary,
+      other: user.other
     };
 
     try {

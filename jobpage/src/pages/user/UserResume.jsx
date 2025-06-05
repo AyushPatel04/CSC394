@@ -75,6 +75,28 @@ export default function Dashboard({  }) {
     }
   };
 
+  const FormatTextField = ({ category, text }) => {
+    if (!text) {
+      return (
+        <div>
+          <h2 className="text-xl font-bold mb-2">{category}:</h2>
+          <p className="text-gray-400">None</p>
+          <br></br>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <h2 className="text-xl font-bold mb-2">{category}:</h2>
+        {text.split("\n").map((line, index) => (
+          <div key={index}>{line}</div>
+        ))}
+        <br></br>
+      </div>
+    );
+  };
+
   if (!user) {
     return (
       <div className="flex h-screen justify-center items-center">
@@ -129,12 +151,12 @@ export default function Dashboard({  }) {
                     )}
                   </div> <br></br>
 
-                  <div><h2 className="text-xl font-bold mb-2">Summary:</h2> {user.summary || <span className="text-gray-400">None</span>}</div> <br></br>
-                  <div><h2 className="text-xl font-bold mb-2">Experience:</h2> {user.experience || <span className="text-gray-400">None</span>}</div> <br></br>
-                  <div><h2 className="text-xl font-bold mb-2">Education:</h2> {user.education || <span className="text-gray-400">None</span>}</div> <br></br>
-                  <div><h2 className="text-xl font-bold mb-2">Skills:</h2> {user.skills || <span className="text-gray-400">None</span>}</div> <br></br>
-                  <div><h2 className="text-xl font-bold mb-2">Other:</h2> {user.other || <span className="text-gray-400">None</span>}</div> <br></br>
-
+                  <FormatTextField category="Summary" text={user.summary}/>
+                  <FormatTextField category="Experience" text={user.experience}/>
+                  <FormatTextField category="Education" text={user.education}/>
+                  <FormatTextField category="Skills" text={user.skills}/>
+                  <FormatTextField category="Other" text={user.other}/>
+    
                   <div className="flex gap-2">
                     <button
                         type="button"
