@@ -40,27 +40,32 @@ export default function Listings() {
     if (loading) return <div>Loading your job listings...</div>;
 
     return (
-        <div className="p-4">
-            
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Posted Job Listings</h2>
-                <button
-                    onClick={() => navigate("/dashboard")}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    Back to Dashboard
-                </button>
-            </div>
+        <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
+            <div className="max-w-6xl mx-auto py-10 px-4">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-bold">Posted Job Listings</h1>
+                    <div className="space-x-2">
+                        <button
+                                type="button"
+                                onClick={() => navigate("/newlisting")}
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            >
+                                New Job Listing
+                            </button>
+                        <button
+                        onClick={() => navigate("/dashboard")}
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                        Dashboard
+                        </button>
+                    </div>
+                </div>
 
-            <div className="flex gap-2 mb-6">
-                <button
-                    type="button"
-                    onClick={() => navigate("/newlisting")}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    New Job Listing
-                </button>
-            </div>
+            <p className="mb-8">
+            View your posted job listings below.
+            </p>
+
+            <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
             {listings.length === 0 ? (
                 <p>No listings found.</p>
             ) : (
@@ -88,7 +93,7 @@ export default function Listings() {
                                 <button
                                     type="button"
                                     onClick={() => handleDelete(listing.id)}
-                                    className="bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700"
+                                    className="bg-red-500 text-white px-2 py-1 text-sm rounded hover:bg-red-600"
                                 >
                                     Delete
                                 </button>
@@ -97,6 +102,8 @@ export default function Listings() {
                     ))}
                 </ul>
             )}
+            </div>
+            </div>
         </div>
     );
 }

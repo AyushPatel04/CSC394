@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
-export default function Dashboard({  }) {
+export default function UserResume() {
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
