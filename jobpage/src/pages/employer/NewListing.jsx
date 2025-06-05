@@ -51,12 +51,21 @@ export default function NewListing() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-4xl mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold">New Job Listing</h1><br></br>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">New Job Listing</h1><br></br>
+          <button
+            onClick={() => navigate("/listings")}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Back
+          </button>
+        </div>
+
         <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-2">
           <input
             type="text"
-            placeholder="Job title"
+            placeholder="Job Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -82,7 +91,7 @@ export default function NewListing() {
           </select>
           <input
             type="text"
-            placeholder="Experience required"
+            placeholder="Experience Required"
             value={experience}
             onChange={(e) => setExperience(e.target.value)}
             required
@@ -96,7 +105,7 @@ export default function NewListing() {
             className="w-full p-2 border rounded"
           />
           <textarea
-            placeholder="Job description"
+            placeholder="Job Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
@@ -104,19 +113,20 @@ export default function NewListing() {
           />
           <div className="flex gap-2">
             <button
+              type="submit"
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              disabled={submitting}
+            >
+              {submitting ? "Posting..." : "Post"}
+            </button>
+
+            <button
               type="button"
               onClick={() => navigate("/listings")}
               className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
               disabled={submitting}
             >
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              disabled={submitting}
-            >
-              {submitting ? "Posting..." : "Post Job Listing"}
             </button>
           </div>
         </form>
