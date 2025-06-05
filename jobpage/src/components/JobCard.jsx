@@ -13,11 +13,11 @@ export default function JobCard({ job }) {
 
   const handleDetails = () => {
     if (job.url) {
-        window.open(job.url, "_blank", "noopener,noreferrer")
+      window.open(job.url, "_blank", "noopener,noreferrer");
     } else {
-      navigate(`/listing/${job.id}`)
+      navigate(`/listing/${job.id}`);
     }
-  }
+  };
 
   return (
     <li className="p-5 border rounded-lg shadow-sm hover:shadow-md transition flex justify-between items-start">
@@ -46,19 +46,6 @@ export default function JobCard({ job }) {
         {job.company && <p className="text-gray-600">{job.company}</p>}
         {job.location && <p>{job.location}</p>}
         {job.salary && <p>{job.salary}</p>}
-        
-        {/*
-        {job.url && (
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-block mt-3 text-primary underline hover:text-primaryHover"
-          >
-            View posting →
-          </a>
-        )}
-          */}
       </div>
 
       <div>
