@@ -37,6 +37,26 @@ export default function Listings() {
         }
     };
 
+    const FormatTextField = ({ category, text }) => {
+        if (!text) {
+        return (
+            <div>
+            <h2><strong>{category}:</strong></h2>
+            <p className="text-gray-400">None</p>
+            </div>
+        );
+        }
+
+        return (
+        <div>
+            <h2><strong>{category}:</strong></h2>
+            {text.split("\n").map((line, index) => (
+            <div key={index}>{line}</div>
+            ))}
+        </div>
+        );
+    };
+
     if (loading) return <div>Loading your job listings...</div>;
 
     return (
@@ -78,7 +98,7 @@ export default function Listings() {
                                 <p><strong>Type:</strong> {listing.type}</p>
                                 <p><strong>Experience:</strong> {listing.experience}</p>
                                 <p><strong>Salary:</strong> {listing.salary}</p>
-                                <p><strong>Description:</strong> {listing.description}</p>
+                                <FormatTextField category="Description" text={listing.description}/>
                             </div>
 
                             <div className="flex flex-col gap-2 ml-4">

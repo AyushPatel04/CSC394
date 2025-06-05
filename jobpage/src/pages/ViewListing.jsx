@@ -103,7 +103,6 @@ export default function ViewListing() {
         <div>
           <h2><strong>{category}:</strong></h2>
           <p className="text-gray-400">None</p>
-          <br></br>
         </div>
       );
     }
@@ -114,7 +113,6 @@ export default function ViewListing() {
         {text.split("\n").map((line, index) => (
           <div key={index}>{line}</div>
         ))}
-        <br></br>
       </div>
     );
   };
