@@ -258,15 +258,27 @@ def reset_password(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
+        role = payload.get("role")
     except JWTError:
         raise HTTPException(401, "Invalid token")
 
-    user = session.exec(select(User).where(User.username == username)).first()
-    if not user:
-        raise HTTPException(404, "User not found")
+    if role == "user":
+        user = session.exec(select(User).where(User.username == username)).first()
+        if not user:
+            raise HTTPException(404, "User not found")
+        user.hashed_password = hash_pw(new_password)
+        session.add(user)
 
-    user.hashed_password = hash_pw(new_password)
-    session.add(user)
+    elif role == "employer":
+        employer = session.exec(select(Employer).where(Employer.username == username)).first()
+        if not employer:
+            raise HTTPException(404, "Employer not found")
+        employer.hashed_password = hash_pw(new_password)
+        session.add(employer)
+
+    else:
+        raise HTTPException(400, "Invalid user role")
+
     session.commit()
     return {"message": "Password updated successfully"}
 
