@@ -9,7 +9,8 @@ import {
 } from "react-router-dom";
 
 import Chatbot from "./components/Chatbot";
-
+import Applications      from "./pages/employer/Application";
+import ApplicationDetail from "./pages/employer/ApplicationDetail";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -88,6 +89,8 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
           </ProtectedRoute>
         }
       />
+      <Route path="/employer/applications"           element={<Applications />}/>
+      <Route path="/applications/:id"                element={<ApplicationDetail />}/>
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
