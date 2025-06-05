@@ -283,6 +283,17 @@ def apply_to_job(
     user_resume: str = Body(...),
     session: Session = Depends(get_session)
 ):
+    # Check if the application already exists
+    existing_application = session.exec(
+        select(Application).where(
+            (Application.user_id == user_id) &
+            (Application.job_listing_id == job_listing_id)
+        )
+    ).first()
+
+    if existing_application:
+        raise HTTPException(status_code=409, detail="You have already applied to this job.")
+
     application = Application(
         user_id=user_id,
         employer_id=employer_id,
@@ -363,7 +374,27 @@ def get_current_user(
         raise HTTPException(401, "User not found")
     return user
 
+@app.get("/applications/{user_id}")
+def get_applications(user_id: int, session: Session = Depends(get_session)):
+    results = session.exec(
+        select(Application, JobListing)
+        .join(JobListing, Application.job_listing_id == JobListing.id)
+        .where(Application.user_id == user_id)
+    ).all()
 
+    # Return list of job listings the user applied to
+    return [
+        {
+            "id": listing.id,
+            "title": listing.title,
+            "location": listing.location,
+            "type": listing.type,
+            "experience": listing.experience,
+            "salary": listing.salary,
+            "description": listing.description
+        }
+        for _, listing in results
+    ]
 
 # ----- Employer endpoints -----
 @app.post("/employers", response_model=Employer)

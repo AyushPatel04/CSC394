@@ -26,7 +26,7 @@ export default function ViewListing() {
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
-  const handleApply = () => {
+  const handleApply = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const token = localStorage.getItem("token");
 
@@ -37,30 +37,33 @@ export default function ViewListing() {
 
     const application = {
       user_id: user.id,
-      employer_id: listing.employer_id, // Ensure this field is returned in your jobcard data
+      employer_id: listing.employer_id,
       job_listing_id: listing.id,
-      user_resume: user.resume || "No resume provided"
+      user_resume: user.resume || "No resume provided",
     };
 
-    fetch("http://localhost:8000/apply", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(application)
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to apply.");
-        return res.json();
-      })
-      .then(() => {
-        alert("Application submitted successfully!");
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Error submitting application.");
+    try {
+      const res = await fetch("http://localhost:8000/apply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(application),
       });
+
+      if (res.status === 409) {
+        const data = await res.json();
+        alert(data.detail); // "You have already applied to this job."
+      } else if (!res.ok) {
+        throw new Error("Failed to apply.");
+      } else {
+        alert("Application submitted successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error submitting application.");
+    }
   };
 
   if (loading) {
