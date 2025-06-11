@@ -54,7 +54,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
         element={
           <ProtectedRoute token={token}>
             {role === "employer" ? (
-              <EmployerDashboard logout={logout} />
+              <EmployerDashboard logout={logout} showProfileEditor={showProfileEditor}/>
             ) : (
               <UserDashboard logout={logout} showProfileEditor={showProfileEditor} />
             )}

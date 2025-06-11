@@ -382,7 +382,7 @@ def read_user(user_id: int, session: Session = Depends(get_session)):
     return user
 
 # PUT update a user (NEW)
-@app.put("/users/{user_id}", response_model=User)
+@app.put("/users/{user_id}")
 def update_user(user_id: int, updated_user: User, session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     if not user:
@@ -395,6 +395,10 @@ def update_user(user_id: int, updated_user: User, session: Session = Depends(get
     session.add(user)
     session.commit()
     session.refresh(user)
+
+    user = user.dict()
+    user["role"] = "user"
+    
     return user
 
 '''
@@ -475,7 +479,7 @@ def get_received_applications(employer_id: int, session: Session = Depends(get_s
 
 
 # PUT update an employer
-@app.put("/employers/{employer_id}", response_model=Employer)
+@app.put("/employers/{employer_id}")
 def update_employer(employer_id: int, updated_employer: Employer, session: Session = Depends(get_session)):
     employer = session.get(Employer, employer_id)
     if not employer:
@@ -488,6 +492,10 @@ def update_employer(employer_id: int, updated_employer: Employer, session: Sessi
     session.add(employer)
     session.commit()
     session.refresh(employer)
+
+    employer = employer.dict()
+    employer["role"] = "employer"
+    
     return employer
 
 @app.delete("/employers/{employer_id}")

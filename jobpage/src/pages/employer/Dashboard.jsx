@@ -1,9 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
-export default function Dashboard({ logout }) {
+export default function Dashboard({ logout, showProfileEditor }) {
   const [employer, setEmployer] = useState(null);
-  const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [counts, setCounts] = useState({});
   const [form, setForm] = useState({
@@ -35,9 +34,6 @@ export default function Dashboard({ logout }) {
         .catch(err => console.error("Failed to fetch application statuses", err));
     }, [employer]);
 
-  const handleEdit = () => setEditing(true);
-  const handleCancel = () => setEditing(false);
-
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -59,7 +55,7 @@ export default function Dashboard({ logout }) {
       const updated = await res.json();
       setEmployer(updated);
       localStorage.setItem("user", JSON.stringify(updated));
-      setEditing(false);
+      navigate("/dashboard");
     } catch (err) {
       alert("Error updating profile.");
     } finally {
@@ -101,7 +97,7 @@ export default function Dashboard({ logout }) {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
+
           {/* Sidebar */}
           <div className="bg-white rounded-lg shadow p-4 space-y-4">
             <div className="text-center">
@@ -109,7 +105,7 @@ export default function Dashboard({ logout }) {
               <p className="text-blue-600">@{employer.username || "yourusername"}</p>
               <button
                 className="mt-3 text-sm text-blue-600"
-                onClick={handleEdit}
+                onClick={() => navigate("/dashboard/profile")}
               >
                 Edit Profile
               </button>
@@ -146,7 +142,7 @@ export default function Dashboard({ logout }) {
           {/* Main Content */}
           <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
             <section>
-              {!editing ? (
+              {!showProfileEditor ? (
                 <div>
                   <h3 className="text-xl font-bold mb-2">Application Status Summary</h3> <br></br>
                   <div><b>Total Applications:</b> <br></br> {counts["Total"] || <span className="text-gray-400">0</span>}</div> <br></br>
@@ -158,13 +154,13 @@ export default function Dashboard({ logout }) {
                 </div>
               ) : (
                 <>
-                <h3 className="text-xl font-bold mb-2">Edit Profile</h3> <br></br>
-                <form onSubmit={handleSave} className="space-y-2">
+                <h3 className="text-xl font-bold mb-2">Edit Company Name</h3>
+                <form onSubmit={handleSave} className="space-y-6">
                   <input
                     name="employer_name"
                     value={form.employer_name}
                     onChange={handleChange}
-                    placeholder="Employer Name"
+                    placeholder="Company Name"
                     className="border p-2 rounded w-full"
                     disabled={loading}
                   />
@@ -178,7 +174,7 @@ export default function Dashboard({ logout }) {
                     </button>
                     <button
                       type="button"
-                      onClick={handleCancel}
+                      onClick={() => navigate("/dashboard")}
                       className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
                       disabled={loading}
                     >
