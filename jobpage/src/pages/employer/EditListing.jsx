@@ -95,14 +95,17 @@ export default function EditListing() {
                             className="border p-2 rounded w-full"
                             required
                         />
-                        <input
-                            name="type"
+                        <select
                             value={form.type}
                             onChange={handleChange}
-                            placeholder="Job Type"
-                            className="border p-2 rounded w-full"
+                            className="w-full p-2 border rounded"
                             required
-                        />
+                        >
+                            <option>Full-Time</option>
+                            <option>Part-Time</option>
+                            <option>Internship</option>
+                            <option>Contract</option>
+                        </select>
                         <input
                             name="experience"
                             value={form.experience}

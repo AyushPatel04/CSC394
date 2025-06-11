@@ -5,7 +5,7 @@ export default function NewListing() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
-  const [type, setType] = useState("Full-time");
+  const [type, setType] = useState("Full-Time");
   const [experience, setExperience] = useState("");
   const [salary, setSalary] = useState("");
   const [description, setDescription] = useState("");
@@ -84,8 +84,8 @@ export default function NewListing() {
             onChange={(e) => setType(e.target.value)}
             className="w-full p-2 border rounded"
           >
-            <option>Full-time</option>
-            <option>Part-time</option>
+            <option>Full-Time</option>
+            <option>Part-Time</option>
             <option>Internship</option>
             <option>Contract</option>
           </select>

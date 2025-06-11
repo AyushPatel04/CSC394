@@ -32,14 +32,7 @@ export default function Login({ setToken, setUser }) {
         setToken(data.access_token);
         setUser(data.user);
 
-        //nav("/dashboard");
-        if (data.user.role === "employer") {
-          nav("/employer/dashboard");
-        } else if (data.user.role === "user") {
-          nav("/user/dashboard");
-        } else {            
-          nav("/");
-        }
+        nav("/dashboard");
       })
       .catch((e) => {
         console.error("Login error:", e);
