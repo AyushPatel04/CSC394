@@ -26,6 +26,10 @@ export default function Application() {
         </button>
       </div>
 
+      <p className="mb-8">
+        Review and manage the status of your received applications below.
+      </p>
+
       {apps.length === 0 ? (
         <p>No applications yet.</p>
       ) : (
@@ -46,7 +50,7 @@ export default function Application() {
                 <td className="p-3">{a.status}</td>
                 <td className="p-3">
                   <Link
-                    to={`/applications/${a.id}`}
+                    to={`/employer/applications/${a.id}`}
                     className="text-blue-600 underline"
                   >
                     Details

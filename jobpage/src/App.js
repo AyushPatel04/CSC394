@@ -61,8 +61,24 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
           </ProtectedRoute>
         }
       />
-      <Route path="/dashboard/applied" element={<AppliedJobs />} />
-      <Route path="/dashboard/resume" element={<UserResume />} />
+
+      {/* User protected routes */}
+      <Route
+        path="/user/applications"
+        element={
+          <ProtectedRoute token={token} role={role} requiredRole={"user"}>
+            <AppliedJobs />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/resume"
+        element={
+          <ProtectedRoute token={token} role={role} requiredRole={"user"}>
+            <UserResume />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Employer protected routes */}
       <Route
@@ -89,8 +105,22 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
           </ProtectedRoute>
         }
       />
-      <Route path="/employer/applications"           element={<Applications />}/>
-      <Route path="/applications/:id"                element={<ApplicationDetail />}/>
+      <Route
+        path="/employer/applications" 
+        element={
+          <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
+            <Applications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/applications/:id" 
+        element={
+          <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
+            <ApplicationDetail />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
