@@ -621,6 +621,44 @@ def get_applications(user_id: int, session: Session = Depends(get_session)):
     ]
     """
 
+@app.get("/applications/status/user/{user_id}")
+def get_application_status(user_id: int, session: Session = Depends(get_session)):
+    statuses = ["Submitted", "Under Review", "Interview", "Rejected", "Accepted"]
+    results = {}
+    total = 0
+
+    for status in statuses:
+        count = session.exec(
+            select(func.count()).where(
+                Application.status == status,
+                Application.user_id == user_id
+            )
+        ).one()
+        results[status] = count
+        total += count
+        
+    results["Total"] = total
+    return results
+
+@app.get("/applications/status/employer/{employer_id}")
+def get_application_status(employer_id: int, session: Session = Depends(get_session)):
+    statuses = ["Submitted", "Under Review", "Interview", "Rejected", "Accepted"]
+    results = {}
+    total = 0
+
+    for status in statuses:
+        count = session.exec(
+            select(func.count()).where(
+                Application.status == status,
+                Application.employer_id == employer_id
+            )
+        ).one()
+        results[status] = count
+        total += count
+        
+    results["Total"] = total
+    return results
+
 @app.delete("/applications/{application_id}")
 def delete_application(application_id: int, session: Session = Depends(get_session)):
     application = session.get(Application, application_id)

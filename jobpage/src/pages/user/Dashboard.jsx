@@ -5,6 +5,7 @@ export default function Dashboard({ logout, showProfileEditor }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [counts, setCounts] = useState({});
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -32,6 +33,15 @@ export default function Dashboard({ logout, showProfileEditor }) {
       setUser(null);
     }
   }, []);
+
+  useEffect(() => {
+    const userId = user?.id;
+    if (!userId) return;
+    fetch(`http://localhost:8000/applications/status/user/${userId}`)
+      .then(res => res.json())
+      .then(setCounts)
+      .catch(err => console.error("Failed to fetch application statuses", err));
+  }, [user]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -96,6 +106,7 @@ export default function Dashboard({ logout, showProfileEditor }) {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
           {/* Sidebar */}
           <div className="bg-white rounded-lg shadow p-4 space-y-4">
             <div className="text-center">
@@ -116,15 +127,10 @@ export default function Dashboard({ logout, showProfileEditor }) {
             </div>
 
             <nav className="space-y-2 text-sm mt-6">
-              {/*}
-              <button className="block w-full text-left hover:text-[#14B8A6]" onClick={() => navigate("/")}>
-                Home
-              </button>
-              */}
-              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/dashboard/resume")}>
+              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/resume")}>
                 Resume
               </button>
-              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/dashboard/applied")}>
+              <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/user/applications")}>
                 Applications
               </button>
               <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/reset")}>
@@ -143,7 +149,7 @@ export default function Dashboard({ logout, showProfileEditor }) {
           <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
             {showProfileEditor ? (
               <section>
-                <h3 className="text-lg font-semibold mb-2">Edit Profile</h3>
+                <h3 className="text-xl font-semibold mb-2">Edit Profile</h3>
                 <form onSubmit={handleSave} className="space-y-2">
                   <div className="flex gap-2">
                     <input
@@ -232,38 +238,14 @@ export default function Dashboard({ logout, showProfileEditor }) {
               </section>
             ) : (
               <>
-              {/*}
-                <section>
-                  <h3 className="text-lg font-semibold mb-2">Your Applications</h3>
-                  <p className="text-sm text-gray-600">No applications to display yet.</p>
-                </section>
-                <section>
-                  <h3 className="text-lg font-semibold mb-2">Saved Jobs</h3>
-                  <p className="text-sm text-gray-600">You haven't saved any jobs yet.</p>
-                </section>
-                */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Profile</h3>
-                  <div><b>Full Name:</b> {(user.first_name || "") + " " + (user.last_name || "")}</div>
-                  <div><b>Email:</b> {user.email || <span className="text-gray-400">None</span>}</div>
-                  <div><b>Phone:</b> {user.phone || <span className="text-gray-400">None</span>}</div>
-                  <div><b>Location:</b> {user.location || <span className="text-gray-400">None</span>}</div>
-                  <div>
-                    <b>LinkedIn:</b>{" "}
-                    {user.linkedin_url ? (
-                      <a
-                        href={user.linkedin_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#14B8A6] underline"
-                      >
-                        {user.linkedin_url}
-                      </a>
-                    ) : (
-                      <span className="text-gray-400">None</span>
-                    )}
-                  </div>
-                  <div><b>About Me:</b> {user.about_me || <span className="text-gray-400">None</span>}</div>
+                  <h3 className="text-xl font-bold mb-2">Application Status Summary</h3> <br></br>
+                  <div><b>Total Applications:</b> <br></br> {counts["Total"] || <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Submitted:</b> <br></br> {counts["Submitted"] || <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Under Review:</b> <br></br> {counts["Under Review"]|| <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Interview:</b> <br></br> {counts["Interview"] || <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Rejected:</b> <br></br> {counts["Rejected"] || <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Accepted:</b> <br></br> {counts["Accepted"] || <span className="text-gray-400">0</span>}</div>
                 </div>
               </>
             )}

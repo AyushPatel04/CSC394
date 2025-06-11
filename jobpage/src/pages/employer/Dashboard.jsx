@@ -5,6 +5,7 @@ export default function Dashboard({ logout }) {
   const [employer, setEmployer] = useState(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [counts, setCounts] = useState({});
   const [form, setForm] = useState({
     employer_name: "",
     username: "",
@@ -24,6 +25,15 @@ export default function Dashboard({ logout }) {
       setEmployer(null);
     }
   }, []);
+
+  useEffect(() => {
+      const employerId = employer?.id;
+    if (!employerId) return;
+      fetch(`http://localhost:8000/applications/status/employer/${employerId}`)
+        .then(res => res.json())
+        .then(setCounts)
+        .catch(err => console.error("Failed to fetch application statuses", err));
+    }, [employer]);
 
   const handleEdit = () => setEditing(true);
   const handleCancel = () => setEditing(false);
@@ -91,6 +101,8 @@ export default function Dashboard({ logout }) {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Sidebar */}
           <div className="bg-white rounded-lg shadow p-4 space-y-4">
             <div className="text-center">
               <h2 className="font-bold">{employer.employer_name}</h2>
@@ -131,14 +143,22 @@ export default function Dashboard({ logout }) {
             </nav>
           </div>
 
+          {/* Main Content */}
           <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
             <section>
-              <h3 className="text-lg font-semibold mb-2">Profile</h3>
               {!editing ? (
                 <div>
-                  <div><b>Employer Name:</b> {employer.employer_name}</div>
+                  <h3 className="text-xl font-bold mb-2">Application Status Summary</h3> <br></br>
+                  <div><b>Total Applications:</b> <br></br> {counts["Total"] || <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Submitted:</b> <br></br> {counts["Submitted"] || <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Under Review:</b> <br></br> {counts["Under Review"]|| <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Interview:</b> <br></br> {counts["Interview"] || <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Rejected:</b> <br></br> {counts["Rejected"] || <span className="text-gray-400">0</span>}</div> <br></br>
+                  <div><b>Accepted:</b> <br></br> {counts["Accepted"] || <span className="text-gray-400">0</span>}</div>
                 </div>
               ) : (
+                <>
+                <h3 className="text-xl font-bold mb-2">Edit Profile</h3> <br></br>
                 <form onSubmit={handleSave} className="space-y-2">
                   <input
                     name="employer_name"
@@ -166,6 +186,7 @@ export default function Dashboard({ logout }) {
                     </button>
                   </div>
                 </form>
+                </>
               )}
             </section>
           </div>
