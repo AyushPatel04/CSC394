@@ -401,25 +401,6 @@ def update_user(user_id: int, updated_user: User, session: Session = Depends(get
     
     return user
 
-'''
-# PUT update a user (OLD)
-@app.put("/users/{user_id}", response_model=User)
-def update_user(
-    user_id: int,
-    user_data: UpdateUser,
-    session: Session = Depends(get_session)
-):
-    user = session.get(User, user_id)
-    if not user:
-        raise HTTPException(404, "User not found")
-    user_data_dict = user_data.dict(exclude_unset=True)
-    for key, value in user_data_dict.items():
-        setattr(user, key, value)
-    session.commit()
-    session.refresh(user)
-    return user
-'''
-
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, session: Session = Depends(get_session)):
     user = session.get(User, user_id)
@@ -534,18 +515,6 @@ def get_listings(session: Session = Depends(get_session)):
 
     return listings
 
-'''
-@app.get("/listings")
-def read_listings(
-    search: Optional[str] = None,
-    session: Session = Depends(get_session),
-):
-    stmt = select(JobListing)
-    if search:
-        stmt = stmt.where(JobListing.title.ilike(f"%{search}%"))
-    return {"listings": session.exec(stmt).all()}
-'''
-
 # GET listing by id
 @app.get("/listings/{listing_id}", response_model=JobListing)
 def get_listing(listing_id: int, session: Session = Depends(get_session)):
@@ -612,22 +581,6 @@ def get_applications(user_id: int, session: Session = Depends(get_session)):
         listings.append(data)
 
     return listings
-
-
-    """
-    return [
-        {
-            "id": listing.id,
-            "title": listing.title,
-            "location": listing.location,
-            "type": listing.type,
-            "experience": listing.experience,
-            "salary": listing.salary,
-            "description": listing.description
-        }
-        for _, listing, employer in results
-    ]
-    """
 
 @app.get("/applications/status/user/{user_id}")
 def get_application_status(user_id: int, session: Session = Depends(get_session)):
@@ -709,8 +662,6 @@ def application_detail(app_id: int, session: Session = Depends(get_session)):
         }
     }
 
-
-
 @app.put("/application/{app_id}/status")
 def update_application_status(
     app_id: int,
@@ -726,6 +677,8 @@ def update_application_status(
     session.commit()
     session.refresh(app)
     return {"message": "Status updated", "application": app}
+
+
 
 # ----- DB Search -----
 @app.get("/search")
@@ -750,6 +703,8 @@ def search_listings(q: str = Query(...), session: Session = Depends(get_session)
         data["company"] = employer_name
         listings.append(data)
     return listings
+
+
 
 # ----- Remotive -----
 ADZUNA_APP_ID = "b93f0af2"

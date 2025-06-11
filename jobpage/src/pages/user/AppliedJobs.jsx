@@ -74,20 +74,7 @@ export default function AppliedJobs() {
                 {job.status && <p><strong>{job.status}</strong></p>}
               </div>
             </li>
-          ))}
-
-            {/*
-            {jobs.map(job => (
-              <li key={job.id} className="border p-4 rounded shadow">
-                <h3 className="font-semibold text-lg">{job.title}</h3>
-                <p><strong>Location:</strong> {job.location}</p>
-                <p><strong>Type:</strong> {job.type}</p>
-                <p><strong>Experience:</strong> {job.experience}</p>
-                <p><strong>Salary:</strong> {job.salary}</p>
-                <p><strong>Description:</strong> {job.description}</p>
-              </li>
             ))}
-              */}
           </ul>
           </div>
         )}
