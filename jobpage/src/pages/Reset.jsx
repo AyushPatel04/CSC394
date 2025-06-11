@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-const Reset = () => {
-  const [mode, setMode] = useState("password");
-  const [username, setUsername] = useState(""); // required for verification
+
+const Reset = ({ setAlert }) => {
+  const [username, setUsername] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
@@ -10,7 +10,7 @@ const Reset = () => {
     e.preventDefault();
 
     try {
-      // Step 1: Try to log in using the username + current password
+      // Step 1: Verify current password
       const loginRes = await fetch("http://localhost:8000/login", {
         method: "POST",
         headers: {
@@ -26,24 +26,22 @@ const Reset = () => {
         throw new Error("Current password is incorrect.");
       }
 
-      // Step 2: Proceed to update password if login was successful
+      // Step 2: Update password
       const resetRes = await fetch("http://localhost:8000/reset/password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({
-          new_password: newPassword,
-        }),
+        body: JSON.stringify({ new_password: newPassword }),
       });
 
       const resetData = await resetRes.json();
       if (!resetRes.ok) throw new Error(resetData.detail || "Error resetting password");
 
-      alert("Password updated successfully!");
+      setAlert({ type: "success", message: "Password updated successfully!" });
     } catch (err) {
-      alert(err.message);
+      setAlert({ type: "error", message: err.message });
     }
   };
 
@@ -97,3 +95,4 @@ const Reset = () => {
 };
 
 export default Reset;
+

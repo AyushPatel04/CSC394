@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function ViewListing() {
+export default function ViewListing({ setAlert }) {
   const { id } = useParams();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,30 +13,30 @@ export default function ViewListing() {
       .then((data) => {
         const match = data.find((l) => l.id.toString() === id);
         if (!match) {
-          alert("Job listing not found");
+          setAlert({ type: "error", message: "Job listing not found." });
           navigate("/home");
           return;
         }
         setListing(match);
       })
       .catch(() => {
-        alert("Error fetching job listing");
+        setAlert({ type: "error", message: "Error fetching job listing." });
         navigate("/home");
       })
       .finally(() => setLoading(false));
-  }, [id, navigate]);
+  }, [id, navigate, setAlert]);
 
   const handleApply = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const token = localStorage.getItem("token");
 
     if (!user || !token) {
-      alert("Please log in to apply for this job.");
+      setAlert({ type: "error", message: "Please log in to apply for this job." });
       return;
     }
 
     if (user.role !== "user") {
-      alert("Only users can apply for jobs.");
+      setAlert({ type: "error", message: "Only job seekers can apply for jobs." });
       return;
     }
 
@@ -54,7 +54,7 @@ export default function ViewListing() {
       skills: user.skills,
       education: user.education,
       summary: user.summary,
-      other: user.other
+      other: user.other,
     };
 
     try {
@@ -69,15 +69,15 @@ export default function ViewListing() {
 
       if (res.status === 409) {
         const data = await res.json();
-        alert(data.detail); // "You have already applied to this job."
+        setAlert({ type: "error", message: data.detail || "Already applied to this job." });
       } else if (!res.ok) {
         throw new Error("Failed to apply.");
       } else {
-        alert("Application submitted successfully!");
+        setAlert({ type: "success", message: "Application submitted successfully!" });
       }
     } catch (err) {
       console.error(err);
-      alert("Error submitting application.");
+      setAlert({ type: "error", message: "Error submitting application." });
     }
   };
 
@@ -128,7 +128,7 @@ export default function ViewListing() {
             <p><strong>Type:</strong> {listing.type}</p>
             <p><strong>Experience:</strong> {listing.experience}</p>
             <p><strong>Salary:</strong> {listing.salary}</p>
-            <FormatTextField category="Description" text={listing.description}/>
+            <FormatTextField category="Description" text={listing.description} />
           </div>
 
           <div className="mt-6 flex gap-4">

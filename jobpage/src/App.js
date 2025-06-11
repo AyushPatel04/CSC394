@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 import Chatbot from "./components/Chatbot";
-import Applications      from "./pages/employer/Application";
+import Applications from "./pages/employer/Application";
 import ApplicationDetail from "./pages/employer/ApplicationDetail";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
@@ -17,6 +17,7 @@ import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import ViewListing from './pages/ViewListing';
 import Reset from "./pages/Reset";
+import Alert from "./components/Alert";
 
 import UserDashboard from "./pages/user/Dashboard";
 import AppliedJobs from "./pages/user/AppliedJobs";
@@ -27,7 +28,7 @@ import EmployerListings from "./pages/employer/Listings";
 import NewListing from "./pages/employer/NewListing";
 import EditListing from "./pages/employer/EditListing";
 
-function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
+function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }) {
   const location = useLocation();
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
@@ -39,14 +40,14 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
     <Routes>
       {/* Public pages */}
       <Route path="/" element={<Welcome token={token} logout={logout} />} />
-      <Route path="/login" element={<Login setToken={setToken} setUser={setUser} />} />
-      <Route path="/signup" element={<Signup setToken={setToken} setUser={setUser} />} />
-      <Route path="/reset" element={<Reset />} />
+      <Route path="/login" element={<Login setToken={setToken} setUser={setUser} setAlert={setAlert} />} />
+      <Route path="/signup" element={<Signup setToken={setToken} setUser={setUser} setAlert={setAlert} />} />
+      <Route path="/reset" element={<Reset setAlert={setAlert} />} />
       <Route
         path="/home"
         element={<Home token={token} logout={logout} onSearch={term => setLastSearch(term)} />}
       />
-      <Route path="/listing/:id" element={<ViewListing />} />
+      <Route path="/listing/:id" element={<ViewListing setAlert={setAlert} />} /> {/* ✅ FIXED */}
 
       {/* Protected dashboards */}
       <Route
@@ -54,7 +55,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
         element={
           <ProtectedRoute token={token}>
             {role === "employer" ? (
-              <EmployerDashboard logout={logout} showProfileEditor={showProfileEditor}/>
+              <EmployerDashboard logout={logout} showProfileEditor={showProfileEditor} />
             ) : (
               <UserDashboard logout={logout} showProfileEditor={showProfileEditor} />
             )}
@@ -93,7 +94,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
         path="/newlisting"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
-            <NewListing />
+            <NewListing setAlert={setAlert} />
           </ProtectedRoute>
         }
       />
@@ -106,7 +107,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
         }
       />
       <Route
-        path="/employer/applications" 
+        path="/employer/applications"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
             <Applications />
@@ -114,7 +115,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
         }
       />
       <Route
-        path="/employer/applications/:id" 
+        path="/employer/applications/:id"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
             <ApplicationDetail />
@@ -130,12 +131,18 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch }) {
 
 export default function App() {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
-
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
   const [lastSearch, setLastSearch] = useState("");
+  const [alert, setAlert] = useState(null);
+
+  // 👇 Auto-dismiss logic
+  const showAlert = (alertObj) => {
+    setAlert(alertObj);
+    setTimeout(() => setAlert(null), 3000);
+  };
 
   useEffect(() => {
     const h = () => {
@@ -156,14 +163,25 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      {alert && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert(null)}
+        />
+      )}
+
       <AppRoutes
         token={token}
         logout={logout}
         setToken={setToken}
         setUser={setUser}
         setLastSearch={setLastSearch}
+        setAlert={showAlert}
       />
+
       <Chatbot lastSearch={lastSearch} />
     </BrowserRouter>
   );
 }
+

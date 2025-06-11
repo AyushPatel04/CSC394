@@ -2,12 +2,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import JbwButton from "../components/buttons";
 
-export default function Login({ setToken, setUser }) {
+export default function Login({ setToken, setUser, setAlert }) {
   const nav = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState(null);
 
   const submit = (e) => {
     e.preventDefault();
@@ -24,27 +23,27 @@ export default function Login({ setToken, setUser }) {
     })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data) => {
-        // Confirm structure before storing
-        if (!data.access_token || !data.user || !data.user.id) throw new Error("Malformed response");
+        if (!data.access_token || !data.user || !data.user.id) {
+          throw new Error("Malformed response");
+        }
 
-        localStorage.setItem("token", data.access_token)
+        localStorage.setItem("token", data.access_token);
         localStorage.setItem("user", JSON.stringify(data.user));
         setToken(data.access_token);
         setUser(data.user);
 
+        setAlert({ type: "success", message: "Welcome back!" });
         nav("/dashboard");
       })
       .catch((e) => {
         console.error("Login error:", e);
-        setErr("Invalid credentials or server error");
+        setAlert({ type: "error", message: "Invalid username or password." });
       });
   };
 
   return (
     <div className="p-6 max-w-sm mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-primary">Log in</h1>
-
-      {err && <p className="text-red-600">{err}</p>}
 
       <form onSubmit={submit} className="space-y-4">
         <input
