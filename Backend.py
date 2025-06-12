@@ -817,45 +817,74 @@ async def _query_adzuna(term: str, limit: int = 3):
         r.raise_for_status()
         data = r.json()
         return data[:limit]
-
+from itertools import islice
 @app.post("/chat")
-async def chat(req: ChatRequest):
+async def chat(req: ChatRequest, session: Session = Depends(get_session)):
     system_prompt = (
         "You are Jobby, a concise, friendly job-search assistant. "
         "If you see job titles, suggest actions or next steps."
     )
+    messages = [{"role": "system", "content": system_prompt}] + req.history
 
-    allowed = {"user", "assistant"}
-    messages = ([{"role": "system", "content": system_prompt}]
-                + [m for m in req.history if m.get("role") in allowed]
-   )
+    
+    terms = (req.search_history or [])[-3:]          
+    adzuna_jobs: list[dict] = []
+    local_jobs: list[dict] = []
 
-    suggestions = []
-    if req.search_history:
-        last_terms = req.search_history[-3:]              
-        for term in last_terms:
-            suggestions += await _query_adzuna(term,2)
+    
+    for t in terms:
+        adzuna_jobs += await _query_adzuna(t, limit=3)   
 
-        
-        seen = set()
-        uniq  = []
-        for j in suggestions:
-            key = j["title"]
-            if key not in seen and len(uniq) < 4:
-                uniq.append(j); seen.add(key)
-        suggestions = uniq
+    
+    if terms:
+        stmt = (
+            select(JobListing, Employer.employer_name)
+            .join(Employer, Employer.id == JobListing.employer_id)
+            .where(
+                or_(*[JobListing.title.ilike(f"%{t}%") for t in terms])
+            )
+            .limit(10)                                    
+        )
+        rows = session.exec(stmt).all()
+        for listing, company in rows:
+            local_jobs.append(
+    {
+        "title":   listing.title,
+        "company": company,
+        "url":     f"/listing/{listing.id}",     
+    }
+)
 
-        titles = ", ".join(j["title"] for j in suggestions)
+    
+    combined = []
+    seen = set()
+    for src in [adzuna_jobs, local_jobs]:
+        for j in src:
+            key = j["title"].lower() + "|" + j["company"].lower()
+            if key not in seen:
+                combined.append(j)
+                seen.add(key)
+            if len(combined) >= 6:          
+                break
+        if len(combined) >= 6:
+            break
+
+    
+    if combined:
+        titles = ", ".join(j["title"] for j in combined)
         messages.append(
             {
                 "role": "system",
-                "content": f"Recent searches: {', '.join(last_terms)}. "
-                           f"Here are some possible matches: {titles}",
+                "content": (
+                    f"Recent searches: {', '.join(terms)}. "
+                    f"Here are matching openings: {titles}"
+                ),
             }
         )
 
+    
     client = AsyncOpenAI(api_key=openai.api_key)
-    resp = await client.chat.completions.create(
+    resp   = await client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=messages,
         max_tokens=120,
@@ -863,16 +892,15 @@ async def chat(req: ChatRequest):
     )
     reply = resp.choices[0].message.content.strip()
 
-    
     return {
         "reply": reply,
         "jobs": [
             {
-                "title": j["title"],
+                "title":   j["title"],
                 "company": j["company"],
-                "url": j["url"],
+                "url":     j["url"],
             }
-            for j in suggestions
+            for j in combined
         ],
     }
 
