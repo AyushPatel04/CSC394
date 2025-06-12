@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
-export default function Listings() {
+export default function Listings({ setAlert }) {
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -9,7 +9,7 @@ export default function Listings() {
     useEffect(() => {
         const employer = JSON.parse(localStorage.getItem("user"));
         const employerId = employer?.id;
-        if (!employer?.id) return alert("Employer ID not found.");
+        if (!employer?.id) return setAlert({ type: "error", message: "Employer's listings not found." });
 
         fetch(`http://localhost:8000/employers/${employerId}/listings`)
             .then ((res) => res.json())
@@ -21,7 +21,7 @@ export default function Listings() {
                 console.error("Failed to load employer's listings:", err);
                 setLoading(false);
             });
-    }, []);
+    }, [setAlert]);
 
     const handleDelete = async listingId => {
         if (!window.confirm("Are you sure you want to delete this job listing?")) return;
@@ -33,7 +33,7 @@ export default function Listings() {
             if (!res.ok) throw new Error("Failed to delete job listing");
             setListings((prev) => prev.filter((listing) => listing.id !== listingId));
         } catch (err) {
-            alert("Error deleting job listing.");
+            return setAlert({ type: "error", message: "Error deleting job listing." });
         }
     };
 

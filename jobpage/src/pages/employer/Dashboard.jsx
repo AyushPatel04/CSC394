@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
-export default function Dashboard({ logout, showProfileEditor }) {
+export default function Dashboard({ logout, showProfileEditor, setAlert }) {
   const [employer, setEmployer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [counts, setCounts] = useState({});
@@ -42,7 +42,7 @@ export default function Dashboard({ logout, showProfileEditor }) {
   const handleSave = async e => {
     e.preventDefault();
     const employerId = employer?.id;
-    if (!employerId) return alert("Employer ID not found.");
+    if (!employerId) return setAlert({ type: "error", message: "Employer not found." });
 
     setLoading(true);
     try {
@@ -57,7 +57,7 @@ export default function Dashboard({ logout, showProfileEditor }) {
       localStorage.setItem("user", JSON.stringify(updated));
       navigate("/dashboard");
     } catch (err) {
-      alert("Error updating profile.");
+      setAlert({ type: "error", message: "Error updating profile." });
     } finally {
       setLoading(false);
     }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function Application() {
+export default function Application({ setAlert }) {
   const [apps, setApps] = useState([]);
   const navigate        = useNavigate();
   const employer        = JSON.parse(localStorage.getItem("user"));
@@ -11,8 +11,8 @@ export default function Application() {
     fetch(`http://localhost:8000/employers/${employer.id}/applications`)
       .then(r => r.json())
       .then(setApps)
-      .catch(() => alert("Unable to load applications"));
-  }, [employer?.id]);
+      .catch(() => setAlert({ type: "error", message: "Unable to load applications." }));
+  }, [employer?.id, setAlert]);
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-4 text-[#0F172A]">

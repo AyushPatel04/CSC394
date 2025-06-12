@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
-export default function UserResume() {
+export default function UserResume({ setAlert }) {
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,7 @@ export default function UserResume() {
   const handleSave = async e => {
     e.preventDefault();
     const userId = user?.id;
-    if (!userId) return alert("User ID not found.");
+    if (!userId) return setAlert({ type: "error", message: "User not found." });
 
     setLoading(true);
     try {
@@ -69,7 +69,7 @@ export default function UserResume() {
       localStorage.setItem("user", JSON.stringify(updated));
       setEditing(false);
     } catch (err) {
-      alert("Error updating resume.");
+      setAlert({ type: "error", message: "Error updating resume." });
     } finally {
       setLoading(false);
     }

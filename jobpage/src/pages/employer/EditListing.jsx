@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 
-export default function EditListing() {
+export default function EditListing({ setAlert }) {
     const { listingId } = useParams();
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -30,14 +30,14 @@ export default function EditListing() {
                     description: data.description || ""
                 });
             } catch (err) {
-                alert("Error loading job listing.");
+                setAlert({ type: "error", message: "Error loading lob listing." });
                 navigate("/listings");
             } finally {
                 setLoading(false);
             }
         };
         fetchListings();
-    }, [listingId, navigate]);
+    }, [listingId, navigate, setAlert]);
 
     const handleChange = e => {
         const { name, value } = e.target;
@@ -57,7 +57,7 @@ export default function EditListing() {
             await res.json();
             navigate("/listings");
         } catch (err) {
-            alert("Error updating job listing.");
+            setAlert({ type: "error", message: "Error updating lob listing." });
         } finally {
             setSubmitting(false);
         }

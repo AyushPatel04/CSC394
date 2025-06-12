@@ -9,8 +9,6 @@ import {
 } from "react-router-dom";
 
 import Chatbot from "./components/Chatbot";
-import Applications from "./pages/employer/Application";
-import ApplicationDetail from "./pages/employer/ApplicationDetail";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -27,6 +25,8 @@ import EmployerDashboard from "./pages/employer/Dashboard";
 import EmployerListings from "./pages/employer/Listings";
 import NewListing from "./pages/employer/NewListing";
 import EditListing from "./pages/employer/EditListing";
+import Applications from "./pages/employer/Application";
+import ApplicationDetail from "./pages/employer/ApplicationDetail";
 
 function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }) {
   const location = useLocation();
@@ -55,9 +55,9 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }
         element={
           <ProtectedRoute token={token}>
             {role === "employer" ? (
-              <EmployerDashboard logout={logout} showProfileEditor={showProfileEditor} />
+              <EmployerDashboard logout={logout} showProfileEditor={showProfileEditor} setAlert={setAlert}/>
             ) : (
-              <UserDashboard logout={logout} showProfileEditor={showProfileEditor} />
+              <UserDashboard logout={logout} showProfileEditor={showProfileEditor} setAlert={setAlert}/>
             )}
           </ProtectedRoute>
         }
@@ -76,7 +76,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }
         path="/resume"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"user"}>
-            <UserResume />
+            <UserResume setAlert={setAlert}/>
           </ProtectedRoute>
         }
       />
@@ -86,7 +86,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }
         path="/listings"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
-            <EmployerListings />
+            <EmployerListings setAlert={setAlert}/>
           </ProtectedRoute>
         }
       />
@@ -102,7 +102,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }
         path="/editlisting/:listingId"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
-            <EditListing />
+            <EditListing setAlert={setAlert}/>
           </ProtectedRoute>
         }
       />
@@ -110,7 +110,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }
         path="/employer/applications"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
-            <Applications />
+            <Applications setAlert={setAlert}/>
           </ProtectedRoute>
         }
       />
@@ -118,7 +118,7 @@ function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }
         path="/employer/applications/:id"
         element={
           <ProtectedRoute token={token} role={role} requiredRole={"employer"}>
-            <ApplicationDetail />
+            <ApplicationDetail setAlert={setAlert}/>
           </ProtectedRoute>
         }
       />

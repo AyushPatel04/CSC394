@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function ApplicationDetail() {
+export default function ApplicationDetail({ setAlert }) {
   const { id }   = useParams();                
   const [data,setData]   = useState(null);
   const [status,setStatus]=useState("");
@@ -11,8 +11,8 @@ export default function ApplicationDetail() {
     fetch(`http://localhost:8000/application/${id}`)
       .then(r => r.json())
       .then(d => { setData(d); setStatus(d.application.status); })
-      .catch(() => alert("Could not load application"));
-  }, [id]);
+      .catch(() => setAlert({ type: "error", message: "Unable to load application." }));
+  }, [id, setAlert]);
 
   const saveStatus = () => {
     fetch(`http://localhost:8000/application/${id}/status`,{
@@ -21,8 +21,8 @@ export default function ApplicationDetail() {
       body:JSON.stringify({ status })
     })
       .then(r=>r.json())
-      .then(() => alert("Status updated"))
-      .catch(()=>alert("Error updating status"));
+      .then(() => setAlert({ type: "success", message: "Status updated." }))
+      .catch(()=> setAlert({ type: "error", message: "Unable to update status." }));
   };
 
   if (!data) return null;
