@@ -26,7 +26,7 @@ export default function Listings({ setAlert }) {
     }, [setAlert, apiBaseUrl]);
 
     const handleDelete = async listingId => {
-        if (!window.confirm("Are you sure you want to delete this job listing?")) return;
+        if (!window.confirm("Are you sure you want to delete this job listing?")) return setAlert({ type: "success", message: "Deleted job listing." });
 
         try {
             const res = await fetch(apiBaseUrl + `/listings/${listingId}`, {
