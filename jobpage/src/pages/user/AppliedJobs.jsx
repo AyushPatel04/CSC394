@@ -36,12 +36,12 @@ export default function AppliedJobs() {
           View and track your submitted applications below.
         </p>
 
+        <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
         {loading ? (
           <p className="text-gray-500">Loading...</p>
         ) : jobs.length === 0 ? (
           <p className="text-gray-500">You have not applied to any jobs yet.</p>
         ) : (
-          <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
           <ul className="space-y-4">
             {jobs.map((job) => (
               <li className="p-5 border rounded-lg shadow-sm hover:shadow-md transition flex justify-between items-start">
@@ -76,8 +76,8 @@ export default function AppliedJobs() {
             </li>
             ))}
           </ul>
-          </div>
         )}
+        </div>
       </div>
     </div>
   );

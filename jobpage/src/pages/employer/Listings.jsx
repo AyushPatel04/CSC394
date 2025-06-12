@@ -87,7 +87,7 @@ export default function Listings({ setAlert }) {
 
             <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
             {listings.length === 0 ? (
-                <p>No listings found.</p>
+                <p className="text-gray-500">You have no job listings posted.</p>
             ) : (
                 <ul className="space-y-4">
                     {listings.map((listing) => (

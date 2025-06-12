@@ -31,7 +31,7 @@ export default function Application({ setAlert }) {
       </p>
 
       {apps.length === 0 ? (
-        <p>No applications yet.</p>
+        <p className="text-gray-500">You have not received any applications yet.</p>
       ) : (
         <table className="w-full border rounded">
           <thead className="bg-gray-100 text-left">
