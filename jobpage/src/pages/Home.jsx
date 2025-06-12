@@ -4,6 +4,8 @@ import JbwButton  from "../components/buttons";
 import JobCard    from "../components/JobCard";
 
 export default function Home({ token, logout, onSearch }) {
+  const apiBaseUrl = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+
   const [search, setSearch]  = useState("");
   const [jobs,   setJobs]    = useState([]);
   const [loading, setLoading]= useState(false);
@@ -15,21 +17,23 @@ export default function Home({ token, logout, onSearch }) {
 
     try {
       const localUrl = q ? `/search?q=${encodeURIComponent(q)}` : `/jobcard`;
-      //const adzunaUrl = `/adzuna?q=${encodeURIComponent(q || "software")}`;
+      const adzunaUrl = `/adzuna?q=${encodeURIComponent(q || "software")}`;
 
-      const localRes = await fetch("http://localhost:8000" + localUrl).then(r => r.json());
-      /*
+      // for no Adnuza
+      // const localRes = await fetch(apiBaseUrl + localUrl).then(r => r.json());
+
       const [localRes, adzunaRes] = await Promise.all([
-        fetch("http://localhost:8000" + localUrl).then(r => r.json()),
-        fetch("http://localhost:8000" + adzunaUrl).then(r => r.json())
+        fetch(apiBaseUrl + localUrl).then(r => r.json()),
+        fetch(apiBaseUrl + adzunaUrl).then(r => r.json())
       ]);
-      */
 
       const localJobs = Array.isArray(localRes) ? localRes : localRes.listings ?? [];
-      //const adzunaJobs = Array.isArray(adzunaRes) ? adzunaRes : [];
+      const adzunaJobs = Array.isArray(adzunaRes) ? adzunaRes : [];
 
-      setJobs([...localJobs]);
-      //setJobs([...localJobs, ...adzunaJobs]);
+      // for no Adnuza
+      //setJobs([...localJobs]);
+
+      setJobs([...localJobs, ...adzunaJobs]);
     } catch (err) {
       console.error(err);
       setError("Server error");
