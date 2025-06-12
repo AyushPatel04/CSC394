@@ -135,10 +135,10 @@ export default function App() {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  const [lastSearch, setLastSearch] = useState("");
+  const [searchHistory, setSearchHistory] = useState([]);
   const [alert, setAlert] = useState(null);
 
-  // 👇 Auto-dismiss logic
+  
   const showAlert = (alertObj) => {
     setAlert(alertObj);
     setTimeout(() => setAlert(null), 3000);
@@ -176,11 +176,11 @@ export default function App() {
         logout={logout}
         setToken={setToken}
         setUser={setUser}
-        setLastSearch={setLastSearch}
+        setLastSearch={term => setSearchHistory(h => [...h, term])}
         setAlert={showAlert}
       />
 
-      <Chatbot lastSearch={lastSearch} />
+      <Chatbot searchHistory={searchHistory} />
     </BrowserRouter>
   );
 }
