@@ -21,7 +21,7 @@ export default function AppliedJobs() {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-6xl mx-auto py-10 px-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Applications</h1>
+          <h1 className="text-3xl font-bold text-blue-600">Applications</h1>
           <div className="space-x-2">
             <button
               onClick={() => navigate("/dashboard")}

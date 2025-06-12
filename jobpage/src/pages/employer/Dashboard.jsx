@@ -75,7 +75,7 @@ export default function Dashboard({ logout, showProfileEditor, setAlert }) {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-6xl mx-auto py-10 px-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Welcome to Your Dashboard</h1>
+          <h1 className="text-3xl font-bold text-blue-600">Welcome to Your Dashboard</h1>
           <div className="space-x-2">
             <button
               onClick={() => navigate("/home")}
@@ -101,17 +101,17 @@ export default function Dashboard({ logout, showProfileEditor, setAlert }) {
           {/* Sidebar */}
           <div className="bg-white rounded-lg shadow p-4 space-y-4">
             <div className="text-center">
-              <h2 className="font-bold">{employer.employer_name}</h2>
-              <p className="text-blue-600">@{employer.username || "yourusername"}</p>
-              <button
-                className="mt-3 text-sm text-blue-600"
-                onClick={() => navigate("/dashboard/profile")}
-              >
-                Edit Profile
-              </button>
+              <h2 className="font-bold text-blue-600">{employer.employer_name}</h2>
+              <p>@{employer.username || "yourusername"}</p>
             </div>
 
             <nav className="space-y-2 text-sm">
+              <button
+                className="block w-full text-left hover:text-blue-600"
+                onClick={() => navigate("/dashboard/profile")}
+              >
+                Edit Company Name
+              </button>
               <button
                 className="block w-full text-left hover:text-blue-600"
                 onClick={() => navigate("/listings")}
@@ -144,7 +144,7 @@ export default function Dashboard({ logout, showProfileEditor, setAlert }) {
             <section>
               {!showProfileEditor ? (
                 <div>
-                  <h3 className="text-xl font-bold mb-2">Application Status Summary</h3> <br></br>
+                  <h3 className="text-xl font-bold mb-2 text-blue-600">Application Status Summary</h3> <br></br>
                   <div><b>Total Applications:</b> <br></br> {counts["Total"] || <span className="text-gray-400">0</span>}</div> <br></br>
                   <div><b>Submitted:</b> <br></br> {counts["Submitted"] || <span className="text-gray-400">0</span>}</div> <br></br>
                   <div><b>Under Review:</b> <br></br> {counts["Under Review"]|| <span className="text-gray-400">0</span>}</div> <br></br>
@@ -154,7 +154,7 @@ export default function Dashboard({ logout, showProfileEditor, setAlert }) {
                 </div>
               ) : (
                 <>
-                <h3 className="text-xl font-bold mb-2">Edit Company Name</h3>
+                <h3 className="text-xl font-bold mb-2 text-blue-600">Edit Company Name</h3>
                 <form onSubmit={handleSave} className="space-y-6">
                   <input
                     name="employer_name"

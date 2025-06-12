@@ -48,7 +48,7 @@ const Reset = ({ setAlert }) => {
   return (
     <div>
       <div className="max-w-md mx-auto mt-12 p-6 border border-gray-300 rounded shadow">
-        <h2 className="text-2xl font-semibold text-center mb-6">
+        <h2 className="text-2xl font-semibold text-center mb-6 text-blue-600">
           Reset Password
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4 text-center">

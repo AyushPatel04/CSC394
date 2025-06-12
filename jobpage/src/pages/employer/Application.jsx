@@ -17,7 +17,7 @@ export default function Application({ setAlert }) {
   return (
     <div className="max-w-5xl mx-auto py-10 px-4 text-[#0F172A]">
       <div className="flex justify-between mb-6">
-        <h1 className="text-3xl font-bold">Applications</h1>
+        <h1 className="text-3xl font-bold text-blue-600">Applications</h1>
         <button
           onClick={() => navigate(-1)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"

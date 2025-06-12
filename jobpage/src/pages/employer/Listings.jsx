@@ -63,7 +63,7 @@ export default function Listings({ setAlert }) {
         <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
             <div className="max-w-6xl mx-auto py-10 px-4">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold">Posted Job Listings</h1>
+                    <h1 className="text-3xl font-bold text-blue-600">Posted Job Listings</h1>
                     <div className="space-x-2">
                         <button
                             type="button"
@@ -93,7 +93,7 @@ export default function Listings({ setAlert }) {
                     {listings.map((listing) => (
                         <li key={listing.id} className="border p-4 rounded shadow flex justify-between items-start">
                             <div>
-                                <h3 className="text-lg font-semibold">{listing.title}</h3>
+                                <h3 className="text-lg font-semibold text-blue-600">{listing.title}</h3>
                                 <p><strong>Location:</strong> {listing.location}</p>
                                 <p><strong>Type:</strong> {listing.type}</p>
                                 <p><strong>Experience:</strong> {listing.experience}</p>

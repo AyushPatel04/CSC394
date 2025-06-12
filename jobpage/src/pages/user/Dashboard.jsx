@@ -84,7 +84,7 @@ export default function Dashboard({ logout, showProfileEditor, setAlert }) {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-6xl mx-auto py-10 px-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Welcome to Your Dashboard</h1>
+          <h1 className="text-3xl font-bold text-blue-600">Welcome to Your Dashboard</h1>
           <div className="space-x-2">
             <button
               onClick={() => navigate("/home")}
@@ -115,18 +115,17 @@ export default function Dashboard({ logout, showProfileEditor, setAlert }) {
                 alt="Profile"
                 className="w-24 h-24 rounded-full mx-auto"
               />
-              <h2 className="font-bold">{`${user.first_name || ""} ${user.last_name || ""}`}</h2>
-              <p className="text-blue-600">@{user.username}</p>
+              <h2 className="font-bold text-blue-600">{`${user.first_name || ""} ${user.last_name || ""}`}</h2>
+              <p>@{user.username}</p>
+            </div>
 
+            <nav className="space-y-2 text-sm mt-6">
               <button
-                className="mt-3 text-sm text-blue-600"
+                className="block w-full text-left hover:text-blue-600"
                 onClick={() => navigate("/dashboard/profile")}
               >
                 Edit Profile
               </button>
-            </div>
-
-            <nav className="space-y-2 text-sm mt-6">
               <button className="block w-full text-left hover:text-blue-600" onClick={() => navigate("/resume")}>
                 Resume
               </button>
@@ -149,7 +148,7 @@ export default function Dashboard({ logout, showProfileEditor, setAlert }) {
           <div className="md:col-span-2 bg-white rounded-lg shadow p-6 space-y-6">
             {showProfileEditor ? (
               <section>
-                <h3 className="text-xl font-semibold mb-2">Edit Profile</h3>
+                <h3 className="text-xl font-semibold mb-2 text-blue-600">Edit Profile</h3>
                 <form onSubmit={handleSave} className="space-y-2">
                   <div className="flex gap-2">
                     <input
@@ -239,7 +238,7 @@ export default function Dashboard({ logout, showProfileEditor, setAlert }) {
             ) : (
               <>
                 <div>
-                  <h3 className="text-xl font-bold mb-2">Application Status Summary</h3> <br></br>
+                  <h3 className="text-xl font-bold mb-2 text-blue-600">Application Status Summary</h3> <br></br>
                   <div><b>Total Applications:</b> <br></br> {counts["Total"] || <span className="text-gray-400">0</span>}</div> <br></br>
                   <div><b>Submitted:</b> <br></br> {counts["Submitted"] || <span className="text-gray-400">0</span>}</div> <br></br>
                   <div><b>Under Review:</b> <br></br> {counts["Under Review"]|| <span className="text-gray-400">0</span>}</div> <br></br>

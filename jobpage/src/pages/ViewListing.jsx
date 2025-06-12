@@ -121,7 +121,7 @@ export default function ViewListing({ setAlert }) {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-3xl mx-auto py-10 px-4">
         <div className="md:col-span-4 bg-white rounded-lg shadow p-6 space-y-6">
-          <h2 className="text-2xl font-bold mb-4">{listing.title}</h2>
+          <h2 className="text-2xl font-bold text-blue-600 mb-4">{listing.title}</h2>
           <div className="space-y-2">
             <p><strong>Company:</strong> {listing.company}</p>
             <p><strong>Location:</strong> {listing.location}</p>

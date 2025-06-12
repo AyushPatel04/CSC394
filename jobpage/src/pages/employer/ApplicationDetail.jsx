@@ -60,8 +60,8 @@ export default function ApplicationDetail({ setAlert }) {
         ← Back
       </button>
 
-      <h1 className="text-2xl font-bold mb-4">
-        Application #{id} – {listing.title}
+      <h1 className="text-2xl font-bold mb-4 text-blue-600">
+        Application #{id} <br></br> {listing.title}
       </h1>
 
       <h2 className="text-xl font-bold mb-2">Contact Information:</h2>

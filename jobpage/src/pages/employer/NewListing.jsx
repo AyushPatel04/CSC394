@@ -52,7 +52,7 @@ export default function NewListing({ setAlert }) {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
       <div className="max-w-4xl mx-auto py-10 px-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">New Job Listing</h1><br />
+          <h1 className="text-3xl font-bold text-blue-600">New Job Listing</h1><br />
           <button
             onClick={() => navigate("/listings")}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"

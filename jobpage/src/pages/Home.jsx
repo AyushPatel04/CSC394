@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import NavBar     from "../components/NavBar";
 import JbwButton  from "../components/buttons";      
 import JobCard    from "../components/JobCard";
 
 export default function Home({ token, logout, onSearch }) {
-  const nav = useNavigate();
-
   const [search, setSearch]  = useState("");
   const [jobs,   setJobs]    = useState([]);
   const [loading, setLoading]= useState(false);
