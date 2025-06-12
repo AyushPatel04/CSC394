@@ -27,7 +27,7 @@ Employers should be able to manage job listings (add new jobs, edit existing lis
 ## Non Functional
 Performance: The website should load in under 3 seconds for 95% of users, ensuring smooth navigation and fast access to job listings and application tracking features, even during peak usage times (e.g., graduation season or job fair weeks).
 
-Security: User data, including login credentials and review information, must be encrypted using AES-256 encryption, with secure authentication mechanisms to protect user privacy.
+Security: Login credentials must be protected using bcrypt to protect user privacy.
 
 Usability: The website should have an intuitive, easy-to-use interface on desktop devices, achieving a user satisfaction score of at least 80% for ease of navigation and functionality. 
 
