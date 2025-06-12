@@ -15,17 +15,21 @@ export default function Home({ token, logout, onSearch }) {
 
     try {
       const localUrl = q ? `/search?q=${encodeURIComponent(q)}` : `/jobcard`;
-      const adzunaUrl = `/adzuna?q=${encodeURIComponent(q || "software")}`;
+      //const adzunaUrl = `/adzuna?q=${encodeURIComponent(q || "software")}`;
 
+      const localRes = await fetch("http://localhost:8000" + localUrl).then(r => r.json());
+      /*
       const [localRes, adzunaRes] = await Promise.all([
         fetch("http://localhost:8000" + localUrl).then(r => r.json()),
         fetch("http://localhost:8000" + adzunaUrl).then(r => r.json())
       ]);
+      */
 
       const localJobs = Array.isArray(localRes) ? localRes : localRes.listings ?? [];
-      const adzunaJobs = Array.isArray(adzunaRes) ? adzunaRes : [];
+      //const adzunaJobs = Array.isArray(adzunaRes) ? adzunaRes : [];
 
-      setJobs([...localJobs, ...adzunaJobs]);
+      setJobs([...localJobs]);
+      //setJobs([...localJobs, ...adzunaJobs]);
     } catch (err) {
       console.error(err);
       setError("Server error");
