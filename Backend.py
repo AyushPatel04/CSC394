@@ -17,6 +17,8 @@ import openai
 from openai import AsyncOpenAI
 import httpx
 from fastapi import Body
+from dotenv import load_dotenv
+load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 # ----- Auth config -----
@@ -144,7 +146,7 @@ class SignupAttempt(BaseModel):
     
 class ChatRequest(BaseModel):
     history: list[dict]           
-    last_search: str | None = None
+    search_history: list[str] | None = None
 
 
 
@@ -706,7 +708,7 @@ def search_listings(q: str = Query(...), session: Session = Depends(get_session)
 
 
 
-# ----- Remotive -----
+# ----- Adzuna -----
 ADZUNA_APP_ID = "b93f0af2"
 ADZUNA_APP_KEY = "ac2968e9aa37b2d474d60277da360974"
 
@@ -809,47 +811,70 @@ def get_usernames(session: Session = Depends(get_session)):
     return {
         "usernames": [u.username for u in users + employers]
     }
+async def _query_adzuna(term: str, limit: int = 3):
+    async with httpx.AsyncClient(timeout=10) as client:
+        r = await client.get("http://localhost:8000/adzuna", params={"q": term})
+        r.raise_for_status()
+        data = r.json()
+        return data[:limit]
+
 @app.post("/chat")
 async def chat(req: ChatRequest):
     system_prompt = (
         "You are Jobby, a concise, friendly job-search assistant. "
-        "If you see a list of job titles, suggest actions or next steps."
+        "If you see job titles, suggest actions or next steps."
     )
 
-    messages = [{"role": "system", "content": system_prompt}] + req.history
+    allowed = {"user", "assistant"}
+    messages = ([{"role": "system", "content": system_prompt}]
+                + [m for m in req.history if m.get("role") in allowed]
+   )
 
-    
-    rec_summary = ""
-    if req.last_search:
-        jobs = await _query_remotive({"search": req.last_search, "limit": 3})
-        if jobs:
-            rec_summary = "\n".join(
-                f"- {j['title']} at {j['company_name']}" for j in jobs[:3]
-            )
-            messages.append(
-                {
-                    "role": "system",
-                    "content": f"User last searched: {req.last_search}\n"
-                               f"Here are some current matching openings:\n{rec_summary}",
-                }
-            )
-    
-    messages = [m for m in messages if m.get("content") not in (None, "", "null")]
+    suggestions = []
+    if req.search_history:
+        last_terms = req.search_history[-3:]              
+        for term in last_terms:
+            suggestions += await _query_adzuna(term,2)
+
+        
+        seen = set()
+        uniq  = []
+        for j in suggestions:
+            key = j["title"]
+            if key not in seen and len(uniq) < 4:
+                uniq.append(j); seen.add(key)
+        suggestions = uniq
+
+        titles = ", ".join(j["title"] for j in suggestions)
+        messages.append(
+            {
+                "role": "system",
+                "content": f"Recent searches: {', '.join(last_terms)}. "
+                           f"Here are some possible matches: {titles}",
+            }
+        )
 
     client = AsyncOpenAI(api_key=openai.api_key)
-    try:
-        resp = await client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            max_tokens=120,
-            temperature=0.7,
-        )
-        reply = resp.choices[0].message.content.strip()
-    except Exception as e:
-        print("⚠️ OpenAI error:", e)
-        raise HTTPException(500, f"OpenAI error: {e}")
+    resp = await client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        max_tokens=120,
+        temperature=0.7,
+    )
+    reply = resp.choices[0].message.content.strip()
 
-    return {"reply": reply}
+    
+    return {
+        "reply": reply,
+        "jobs": [
+            {
+                "title": j["title"],
+                "company": j["company"],
+                "url": j["url"],
+            }
+            for j in suggestions
+        ],
+    }
 
 import csv
 from fastapi import UploadFile, File
