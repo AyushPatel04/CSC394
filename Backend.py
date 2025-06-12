@@ -146,7 +146,7 @@ class SignupAttempt(BaseModel):
     
 class ChatRequest(BaseModel):
     history: list[dict]           
-    search_history: list[str] | None = None
+    search_history: Optional[list[str]] = None
 
 
 
