@@ -28,6 +28,9 @@ import EditListing from "./pages/employer/EditListing";
 import Applications from "./pages/employer/Application";
 import ApplicationDetail from "./pages/employer/ApplicationDetail";
 
+
+export const API = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
 function AppRoutes({ token, logout, setToken, setUser, setLastSearch, setAlert }) {
   const location = useLocation();
   const storedUser = localStorage.getItem("user");
